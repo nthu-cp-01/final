@@ -1,0 +1,38 @@
+# Create VPC and IGW
+resource "aws_vpc" "lab_vpc" {
+  cidr_block = "10.0.0.0/16"
+
+  tags = {
+    Name = "lab-vpc"
+  }
+}
+
+# Create security group for RDS
+resource "aws_security_group" "lab_rds_security_group" {
+  name        = "DB Security Group"
+  description = "Permit access from Web Security Group"
+  vpc_id      = aws_vpc.lab_vpc.id
+}
+resource "aws_vpc_security_group_ingress_rule" "lab_sg_allow_rds" {
+  security_group_id            = aws_security_group.lab_rds_security_group.id
+  referenced_security_group_id = aws_security_group.lab_app_security_group.id
+  from_port                    = 3306
+  to_port                      = 3306
+  ip_protocol                  = "tcp"
+}
+
+# Create security group for app
+resource "aws_security_group" "lab_app_security_group" {
+  name        = "App Security Group"
+  description = "Permit access from anywhere"
+  vpc_id      = aws_vpc.lab_vpc.id
+}
+resource "aws_vpc_security_group_ingress_rule" "lab_sg_allow_app" {
+  security_group_id = aws_security_group.lab_app_security_group.id
+
+  cidr_ipv4   = "0.0.0.0/0"
+  from_port   = 80
+  to_port     = 80
+  ip_protocol = "tcp"
+}
+
