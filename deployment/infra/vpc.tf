@@ -10,7 +10,7 @@ resource "aws_vpc" "lab_vpc" {
 # Create security group for RDS
 resource "aws_security_group" "lab_rds_security_group" {
   name        = "DB Security Group"
-  description = "Permit access from Web Security Group"
+  description = "Permit access from App Security Group"
   vpc_id      = aws_vpc.lab_vpc.id
 }
 resource "aws_vpc_security_group_ingress_rule" "lab_sg_allow_rds" {
@@ -18,6 +18,20 @@ resource "aws_vpc_security_group_ingress_rule" "lab_sg_allow_rds" {
   referenced_security_group_id = aws_security_group.lab_app_security_group.id
   from_port                    = 3306
   to_port                      = 3306
+  ip_protocol                  = "tcp"
+}
+
+# Create security group for cache
+resource "aws_security_group" "lab_cache_security_group" {
+  name        = "Cache Security Group"
+  description = "Permit access from App Security Group"
+  vpc_id      = aws_vpc.lab_vpc.id
+}
+resource "aws_vpc_security_group_ingress_rule" "lab_sg_allow_cache" {
+  security_group_id            = aws_security_group.lab_cache_security_group.id
+  referenced_security_group_id = aws_security_group.lab_app_security_group.id
+  from_port                    = 6379
+  to_port                      = 6379
   ip_protocol                  = "tcp"
 }
 
