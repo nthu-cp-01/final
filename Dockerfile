@@ -62,7 +62,10 @@ COPY deployment/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Laravel optimization
-RUN php artisan optimize
+RUN php artisan config:clear
+RUN php artisan route:cache
+RUN php artisan view:cache
+RUN php artisan event:cache
 
 # Expose port 80
 EXPOSE 80
