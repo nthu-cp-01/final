@@ -39,6 +39,13 @@ resource "aws_ecs_task_definition" "laravel_app" {
       name      = "final-app"
       image     = "ghcr.io/nthu-cp-01/final:main"
       essential = true
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost/up || exit 1"]
+        interval    = 300
+        timeout     = 5
+        retries     = 3
+        startPeriod = 120
+      }
       portMappings = [
         {
           containerPort = 80
@@ -48,7 +55,7 @@ resource "aws_ecs_task_definition" "laravel_app" {
       environment = [
         # Application
         { name = "APP_NAME", value = "AWS" },
-        { name = "APP_ENV", value = "local" },
+        { name = "APP_ENV", value = "production" },
         { name = "APP_KEY", value = "base64:3vVjC2JIukr6/8WQrd3cxYsdn4DKNn35h3/t/uIaG5M=" },
         { name = "APP_URL", value = "http://localhost" },
         { name = "APP_DEBUG", value = "true" },
@@ -60,8 +67,8 @@ resource "aws_ecs_task_definition" "laravel_app" {
         { name = "DB_CONNECTION", value = "pgsql" },
         { name = "DB_HOST", value = aws_db_instance.lab_rds_instance.address },
         { name = "DB_PORT", value = tostring(aws_db_instance.lab_rds_instance.port) },
-        { name = "DB_DATABASE", value = "cp_final" },
-        { name = "DB_USERNAME", value = "cpuser" },
+        { name = "DB_DATABASE", value = aws_db_instance.lab_rds_instance.db_name },
+        { name = "DB_USERNAME", value = aws_db_instance.lab_rds_instance.username },
         { name = "DB_PASSWORD", value = "cppassword" },
 
         # Cache

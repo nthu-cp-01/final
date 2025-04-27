@@ -27,6 +27,15 @@ resource "aws_subnet" "lab_public_subnet_a" {
     Name = "lab-subnet-public1-us-east-1a"
   }
 }
+resource "aws_subnet" "lab_public_subnet_b" {
+  vpc_id            = aws_vpc.lab_vpc.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name = "lab-subnet-public1-us-east-1b"
+  }
+}
 resource "aws_route_table" "lab_public_route_table" {
   vpc_id = aws_vpc.lab_vpc.id
 
@@ -41,6 +50,10 @@ resource "aws_route_table" "lab_public_route_table" {
 }
 resource "aws_route_table_association" "lab_add_rtb_public_a" {
   subnet_id      = aws_subnet.lab_public_subnet_a.id
+  route_table_id = aws_route_table.lab_public_route_table.id
+}
+resource "aws_route_table_association" "lab_add_rtb_public_b" {
+  subnet_id      = aws_subnet.lab_public_subnet_b.id
   route_table_id = aws_route_table.lab_public_route_table.id
 }
 
