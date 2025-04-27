@@ -43,8 +43,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY . .
 
 # Install composer dependencies
-# RUN composer install --no-dev --optimize-autoloader
-RUN composer install
+RUN composer install --no-dev --optimize-autoloader
 
 # Install npm dependencies and build assets
 RUN npm install && npm run build
@@ -63,7 +62,7 @@ COPY deployment/docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Laravel optimization
-RUN php artisan optimize:clear
+RUN php artisan config:clear
 RUN php artisan route:cache
 RUN php artisan view:cache
 RUN php artisan event:cache
