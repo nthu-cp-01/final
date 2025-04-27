@@ -72,7 +72,7 @@ resource "aws_ecs_task_definition" "laravel_app" {
         { name = "DB_PASSWORD", value = "cppassword" },
 
         # Cache
-        { name = "REDIS_CLIENT", value = "phpredis" },
+        { name = "REDIS_CLIENT", value = "predis" },
         { name = "REDIS_HOST", value = aws_elasticache_replication_group.lab_redis.primary_endpoint_address },
         { name = "REDIS_PORT", value = "6379" },
         { name = "REDIS_USERNAME", value = "default" },
