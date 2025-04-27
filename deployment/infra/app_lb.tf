@@ -3,8 +3,8 @@ resource "aws_lb" "lab_app_lb" {
   name               = "lab-app-lb"
   load_balancer_type = "application"
   subnets = [
-    aws_subnet.lab_private_subnet_a.id,
-    aws_subnet.lab_private_subnet_b.id
+    aws_subnet.lab_public_subnet_a.id,
+    aws_subnet.lab_public_subnet_b.id
   ]
   security_groups = [aws_security_group.lab_app_security_group.id]
 }
@@ -14,7 +14,7 @@ resource "aws_lb_target_group" "lab_app_tg" {
   name        = "lab-app-tg"
   port        = 80
   protocol    = "HTTP"
-  target_type = "ip" # Fargate requires target_type = "ip"&#8203;:contentReference[oaicite:7]{index=7}
+  target_type = "ip" # Required by Fargate
   vpc_id      = aws_vpc.lab_vpc.id
   health_check {
     path                = "/up"
