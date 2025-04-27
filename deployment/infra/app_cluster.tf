@@ -102,12 +102,13 @@ resource "aws_ecs_task_definition" "laravel_app" {
 
 # ECS Service to run the Laravel task
 resource "aws_ecs_service" "web_service" {
-  name             = "lab-final-laravel-service"
-  cluster          = aws_ecs_cluster.lab_app_cluster.id
-  task_definition  = aws_ecs_task_definition.laravel_app.arn
-  launch_type      = "FARGATE"
-  platform_version = "1.4.0" # latest Fargate platform (supports secrets fetch, etc.)
-  desired_count    = 1
+  name                   = "lab-final-laravel-service"
+  cluster                = aws_ecs_cluster.lab_app_cluster.id
+  task_definition        = aws_ecs_task_definition.laravel_app.arn
+  enable_execute_command = true
+  launch_type            = "FARGATE"
+  platform_version       = "1.4.0" # latest Fargate platform (supports secrets fetch, etc.)
+  desired_count          = 1
 
   network_configuration {
     subnets = [
