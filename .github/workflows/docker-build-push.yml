@@ -12,6 +12,12 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        version: [
+          {file: ./Dockerfile, tag: ghcr.io/nthu-cp-01/final},
+          {file: ./deployment/run_migration/Dockerfile, tag: ghcr.io/nthu-cp-01/final-migration},
+        ]
 
     steps:
       - name: Checkout code
@@ -31,12 +37,13 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/nthu-cp-01/final
+          images: ${{ matrix.version.tag }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ${{ matrix.version.file }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
