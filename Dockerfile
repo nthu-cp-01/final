@@ -2,7 +2,7 @@
 FROM php:8.3-fpm-alpine
 
 # Install dependencies
-RUN apk add --no-cache \
+RUN apk update && apk upgrade && apk add --no-cache \
     nginx \
     supervisor \
     nodejs \
@@ -17,9 +17,12 @@ RUN apk add --no-cache \
     libxml2-dev \
     icu-dev \
     postgresql-dev \
-    # Install PHP extensions
-    && docker-php-ext-install \
-      pdo_mysql \
+    pcre-dev \
+    $PHPIZE_DEPS
+
+# Install PHP extensions
+RUN docker-php-ext-install \
+      pdo \
       pdo_pgsql \
       mbstring \
       exif \
@@ -29,6 +32,14 @@ RUN apk add --no-cache \
       zip \
       intl \
       xml
+
+# Install pecl dependencies
+RUN pecl update-channels \
+    && pecl install redis \
+    && docker-php-ext-enable redis
+
+# Purge phpize dependencies
+RUN apk del $PHPIZE_DEPS
 
 # Set working directory
 WORKDIR /var/www/html
