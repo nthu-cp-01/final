@@ -31,4 +31,10 @@ terraform apply
 - 等它跑完，就會出現下面的畫面，同時會印出我們App的Application Load Balancer的DNS，只要複制後就可以貼進browser打開:
 ![image](https://github.com/user-attachments/assets/6f77c8df-2f7a-431b-9ed6-7ebc0e53cfe0)
 
-## 4. (TBD) 執行Database Migration...
+- 進去之後可以用測試的帳號密碼登入:
+```bash
+username: test@test.com
+password: aoeuaoeu
+```
+
+- 如果出現什麼資料庫的問題，可能是因為migration還沒跑完，可以等個幾分鐘再試試看，或是直接進到ECS Tasks裡看它的執行進度。
