@@ -86,10 +86,9 @@ resource "aws_scheduler_schedule" "migration_once" {
     role_arn = data.aws_iam_role.lab_role.arn
 
     ecs_parameters { # ECS RunTask parameters&#8203;:contentReference[oaicite:5]{index=5}
-      task_definition_arn = aws_ecs_task_definition.laravel_run_migration.arn
-      launch_type         = "FARGATE"
-      platform_version    = "1.4.0" # Use latest Fargate platform
-      task_count          = 1
+      task_definition_arn    = aws_ecs_task_definition.laravel_run_migration.arn
+      task_count             = 1
+      enable_execute_command = true
 
       network_configuration {    # Networking for awsvpc mode&#8203;:contentReference[oaicite:6]{index=6}
         assign_public_ip = false # Task in private subnets
@@ -98,6 +97,16 @@ resource "aws_scheduler_schedule" "migration_once" {
           aws_subnet.lab_private_subnet_b.id
         ]
         security_groups = [aws_security_group.ecs_sg.id]
+      }
+
+      capacity_provider_strategy {
+        capacity_provider = "FARGATE_SPOT"
+        weight            = 4
+      }
+
+      capacity_provider_strategy {
+        capacity_provider = "FARGATE"
+        weight            = 1
       }
     }
   }
