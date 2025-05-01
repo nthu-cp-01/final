@@ -11,6 +11,7 @@ terraform {
 provider "aws" {
   region = "us-east-1"
 }
+provider "tls" {}
 
 data "aws_caller_identity" "current" {}
 data "aws_iam_role" "lab_role" {
