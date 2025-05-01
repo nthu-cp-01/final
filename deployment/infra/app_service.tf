@@ -96,8 +96,8 @@ resource "aws_ecs_service" "web_service" {
 
   network_configuration {
     subnets = [
-      aws_subnet.lab_private_subnet_a.id,
-      aws_subnet.lab_private_subnet_b.id
+      aws_subnet.lab_public_subnet_a.id,
+      aws_subnet.lab_public_subnet_b.id,
     ]
 
     security_groups  = [aws_security_group.ecs_sg.id]

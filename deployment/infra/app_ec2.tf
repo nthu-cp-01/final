@@ -12,10 +12,14 @@ resource "aws_launch_template" "lab_ec2_template" {
   image_id      = "ami-04c73aa7cd73f7830"
   instance_type = "t3.micro"
 
-  key_name               = "vockey"
-  vpc_security_group_ids = [aws_security_group.ecs_sg.id]
+  key_name = "vockey"
   iam_instance_profile {
     name = "LabInstanceProfile"
+  }
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.ecs_sg.id]
   }
 
   block_device_mappings {
@@ -38,8 +42,8 @@ resource "aws_launch_template" "lab_ec2_template" {
 
 resource "aws_autoscaling_group" "lab_ec2_autoscaling_group" {
   vpc_zone_identifier = [
-    aws_subnet.lab_private_subnet_a.id,
-    aws_subnet.lab_private_subnet_b.id
+    aws_subnet.lab_public_subnet_a.id,
+    aws_subnet.lab_public_subnet_b.id,
   ]
   desired_capacity = 1
   max_size         = 1
