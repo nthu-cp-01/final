@@ -90,11 +90,11 @@ resource "aws_scheduler_schedule" "migration_once" {
       task_count             = 1
       enable_execute_command = true
 
-      network_configuration {    # Networking for awsvpc mode&#8203;:contentReference[oaicite:6]{index=6}
-        assign_public_ip = false # Task in private subnets
+      network_configuration { # Networking for awsvpc mode&#8203;:contentReference[oaicite:6]{index=6}
+        assign_public_ip = true
         subnets = [
-          aws_subnet.lab_private_subnet_a.id,
-          aws_subnet.lab_private_subnet_b.id
+          aws_subnet.lab_public_subnet_a.id,
+          aws_subnet.lab_public_subnet_b.id,
         ]
         security_groups = [aws_security_group.ecs_sg.id]
       }
