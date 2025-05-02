@@ -17,7 +17,12 @@
 
 - 存檔離開。
 
-## 3. 切到`deployment/infra`目錄下，並執行terraform指令:
+## 3.1 第一次部署的話，請先切到`deployment/infra`目錄下，清空本地暫存的狀態:
+```bash
+rm -f terraform.tfstate
+```
+
+## 3.2 並執行terraform指令:
 ```bash
 terraform init
 terraform apply
