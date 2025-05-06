@@ -14,7 +14,7 @@ resource "aws_lb_target_group" "lab_app_tg" {
   name        = "lab-app-tg"
   port        = 80
   protocol    = "HTTP"
-  target_type = "ip" # Required by Fargate
+  target_type = "instance"
   vpc_id      = aws_vpc.lab_vpc.id
   health_check {
     path                = "/up"

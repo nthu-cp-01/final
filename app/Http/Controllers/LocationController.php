@@ -13,8 +13,18 @@ class LocationController extends Controller
      */
     public function index()
     {
+        $locations = Location::all()->map(function ($location) {
+            // Add dummy temperature, humidity data, and device status
+            return array_merge($location->toArray(), [
+                'temperature' => rand(18, 30),  // Random temperature between 18-30°C
+                'humidity' => rand(30, 80),     // Random humidity between 30-80%
+                'ac_on' => (bool)rand(0, 1),    // Random boolean for AC status
+                'humidifier_on' => (bool)rand(0, 1), // Random boolean for humidifier status
+            ]);
+        });
+
         return Inertia::render('locations/Index', [
-            'locations' => Location::all()
+            'locations' => $locations
         ]);
     }
 
@@ -34,7 +44,8 @@ class LocationController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'deviceId' => 'required|string|unique:locations,deviceId',
+            'deviceId' => 'required|string|max:255',
+            'shadowName' => 'required|string|max:255',
         ]);
 
         Location::create($validated);
@@ -71,7 +82,8 @@ class LocationController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'deviceId' => 'required|string|unique:locations,deviceId,' . $location->id,
+            'deviceId' => 'required|string|max:255',
+            'shadowName' => 'required|string|max:255',
         ]);
 
         $location->update($validated);
