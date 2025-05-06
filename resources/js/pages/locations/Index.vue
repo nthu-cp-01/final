@@ -30,7 +30,7 @@ interface Location {
     temperature: number;
     humidity: number;
     ac_on: boolean;
-    humidifier_on: boolean;
+    dehumidifier_on: boolean;
 }
 
 interface Props {
@@ -118,7 +118,7 @@ const breadcrumbs: BreadcrumbItem[] = [
                                     </div>
                                 </TableCell>
                                 <TableCell>
-                                    <div :class="location.humidifier_on ? 'text-blue-500' : 'text-gray-400'"
+                                    <div :class="location.dehumidifier_on ? 'text-blue-500' : 'text-gray-400'"
                                         class="flex justify-center">
                                         <Droplets class="h-5 w-5" />
                                     </div>

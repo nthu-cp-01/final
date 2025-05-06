@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Location;
+use App\Services\LocationService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -11,15 +12,17 @@ class LocationController extends Controller
     /**
      * Display a listing of the locations.
      */
-    public function index()
+    public function index(LocationService $locationService)
     {
-        $locations = Location::all()->map(function ($location) {
-            // Add dummy temperature, humidity data, and device status
+
+        $locations = Location::all()->map(function (Location $location) use ($locationService) {
+            $data = $locationService->getThingShadow($location->deviceId, $location->shadowName);
+
             return array_merge($location->toArray(), [
-                'temperature' => rand(18, 30),  // Random temperature between 18-30°C
-                'humidity' => rand(30, 80),     // Random humidity between 30-80%
-                'ac_on' => (bool)rand(0, 1),    // Random boolean for AC status
-                'humidifier_on' => (bool)rand(0, 1), // Random boolean for humidifier status
+                'temperature' => $data['temperature'],
+                'humidity' => $data['humidity'],
+                'ac_on' => $data['ac_is_enable'],
+                'dehumidifier_on' => $data['dehumidifier_is_enable'],
             ]);
         });
 
