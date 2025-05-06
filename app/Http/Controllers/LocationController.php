@@ -82,7 +82,8 @@ class LocationController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'deviceId' => 'required|string|unique:locations,deviceId,' . $location->id,
+            'deviceId' => 'required|string|max:255',
+            'shadowName' => 'required|string|max:255',
         ]);
 
         $location->update($validated);

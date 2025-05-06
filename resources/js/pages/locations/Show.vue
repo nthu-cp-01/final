@@ -11,6 +11,7 @@ interface Location {
   name: string;
   description: string;
   deviceId: string;
+  shadowName: string;
 }
 
 interface Props {
@@ -56,6 +57,11 @@ const breadcrumbs: BreadcrumbItem[] = [
           <div>
             <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Device ID</h3>
             <p class="mt-1 text-lg font-mono">{{ location.deviceId }}</p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Shadow Name</h3>
+            <p class="mt-1 text-lg font-mono">{{ location.shadowName }}</p>
           </div>
           
           <div class="md:col-span-2">
