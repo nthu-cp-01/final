@@ -3,7 +3,7 @@ resource "aws_ecs_task_definition" "laravel_app" {
   family                   = "lab-laravel-task" # task family name
   cpu                      = "1024"             # 1/4 vCPU
   memory                   = "512"              # 0.5 GB
-  network_mode             = "awsvpc"
+  network_mode             = "bridge"
   requires_compatibilities = ["EC2"]
   execution_role_arn       = data.aws_iam_role.lab_role.arn
   task_role_arn            = data.aws_iam_role.lab_role.arn
