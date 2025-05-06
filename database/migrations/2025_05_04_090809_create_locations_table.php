@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
-            $table->string('deviceId')->unique();
+            $table->string('deviceId');
+            $table->string('shadowName');
             $table->timestamps();
             $table->softDeletes();
         });

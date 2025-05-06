@@ -14,6 +14,11 @@ class LocationSeeder extends Seeder
     public function run(): void
     {
         // Create 10 sample locations
-        Location::factory()->count(10)->create();
+        Location::factory()->create([
+            'name' => 'Testing Location in R744',
+            'description' => 'This is a test location for R744',
+            'deviceId' => 'named_test',
+            'shadowName' => 'controller',
+        ]);
     }
 }

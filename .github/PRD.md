@@ -7,7 +7,8 @@
   - id (int autoinc, unique identifier for the location, primary key)
   - name (string, name of the location)
   - description (string, description of the location)
-  - deviceId (string, unique identifier for the IoT device associated with the location)
+  - deviceId (string, identifier for the IoT device name associated with the location)
+  - shadowName (string, identifier for the IoT device shadow associate with the location)
   - use timestamps and softdeletes in migration and model.
 
 ## 2. Functional Requirements
