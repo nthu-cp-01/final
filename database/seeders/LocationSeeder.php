@@ -19,7 +19,7 @@ class LocationSeeder extends Seeder
             'description' => 'This is a test location for R744',
             'deviceId' => 'named_test',
             'controllerShadowName' => 'controller',
-            'sensorShadowName' => 'dht22',
+            'sensorShadowName' => 'dht_sensor',
         ]);
     }
 }
