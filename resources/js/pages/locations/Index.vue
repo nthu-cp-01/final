@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
-import { PlusCircle, Pencil, Trash2, Fan, Droplets, Thermometer, Gauge } from 'lucide-vue-next';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { PlusCircle, Pencil, Trash2, Fan, Droplets, Thermometer, Gauge, PowerOff, Power } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
+import { toast } from 'vue-sonner';
 import {
     Table,
     TableBody,
@@ -22,6 +23,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import { type BreadcrumbItem } from '@/types';
+import { ref } from 'vue';
 
 interface Location {
     id: number;
@@ -45,6 +47,70 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/locations',
     },
 ];
+
+// Track loading states for each device control
+const loadingAc = ref<Record<number, boolean>>({});
+const loadingDehumidifier = ref<Record<number, boolean>>({});
+
+// Handle toggle AC for a location
+const toggleAc = (locationId: number, locationName: string, currentState: boolean) => {
+    loadingAc.value[locationId] = true;
+    
+    // Show loading toast
+    const toastId = toast.loading(`Updating AC for ${locationName}...`);
+    
+    router.post(route('locations.toggle-ac', locationId), {}, {
+        onSuccess: () => {
+            loadingAc.value[locationId] = false;
+            
+            // Update toast on success
+            toast.success(`AC ${!currentState ? 'enabled' : 'disabled'} for ${locationName}`, {
+                id: toastId,
+                description: `Temperature control updated successfully`,
+            });
+        },
+        onError: (error) => {
+            loadingAc.value[locationId] = false;
+            
+            // Update toast on error
+            toast.error(`Failed to update AC for ${locationName}`, {
+                id: toastId,
+                description: error?.message || 'An error occurred while updating the device',
+            });
+        },
+        preserveScroll: true,
+    });
+};
+
+// Handle toggle dehumidifier for a location
+const toggleDehumidifier = (locationId: number, locationName: string, currentState: boolean) => {
+    loadingDehumidifier.value[locationId] = true;
+    
+    // Show loading toast
+    const toastId = toast.loading(`Updating dehumidifier for ${locationName}...`);
+    
+    router.post(route('locations.toggle-dehumidifier', locationId), {}, {
+        onSuccess: () => {
+            loadingDehumidifier.value[locationId] = false;
+            
+            // Update toast on success
+            toast.success(`Dehumidifier ${!currentState ? 'enabled' : 'disabled'} for ${locationName}`, {
+                id: toastId,
+                description: `Humidity control updated successfully`,
+            });
+        },
+        onError: (error) => {
+            loadingDehumidifier.value[locationId] = false;
+            
+            // Update toast on error
+            toast.error(`Failed to update dehumidifier for ${locationName}`, {
+                id: toastId,
+                description: error?.message || 'An error occurred while updating the device',
+            });
+        },
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
@@ -83,16 +149,16 @@ const breadcrumbs: BreadcrumbItem[] = [
                                         <span>Humidity</span>
                                     </div>
                                 </TableHead>
-                                <TableHead class="w-[8%]">
-                                    <div class="flex items-center gap-1">
+                                <TableHead class="w-[8%] text-center">
+                                    <div class="flex items-center justify-center gap-1">
                                         <Fan class="h-4 w-4" />
                                         <span>AC</span>
                                     </div>
                                 </TableHead>
-                                <TableHead class="w-[8%]">
-                                    <div class="flex items-center gap-1">
+                                <TableHead class="w-[8%] text-center">
+                                    <div class="flex items-center justify-center gap-1">
                                         <Droplets class="h-4 w-4" />
-                                        <span>Humidifier</span>
+                                        <span>Dehumidifier</span>
                                     </div>
                                 </TableHead>
                                 <TableHead class="w-[10%] text-right">Actions</TableHead>
@@ -111,17 +177,25 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 </TableCell>
                                 <TableCell>{{ location.temperature }}°C</TableCell>
                                 <TableCell>{{ location.humidity }}%</TableCell>
-                                <TableCell>
-                                    <div :class="location.ac_on ? 'text-green-500' : 'text-gray-400'"
-                                        class="flex justify-center">
-                                        <Fan class="h-5 w-5" />
-                                    </div>
+                                <TableCell class="text-center">
+                                    <Fan 
+                                        class="h-5 w-5 mx-auto cursor-pointer transition-colors" 
+                                        :class="[
+                                            location.ac_on ? 'text-green-500' : 'text-gray-400',
+                                            loadingAc[location.id] ? 'opacity-50' : ''
+                                        ]"
+                                        @click="!loadingAc[location.id] && toggleAc(location.id, location.name, location.ac_on)" 
+                                    />
                                 </TableCell>
-                                <TableCell>
-                                    <div :class="location.dehumidifier_on ? 'text-blue-500' : 'text-gray-400'"
-                                        class="flex justify-center">
-                                        <Droplets class="h-5 w-5" />
-                                    </div>
+                                <TableCell class="text-center">
+                                    <Droplets 
+                                        class="h-5 w-5 mx-auto cursor-pointer transition-colors" 
+                                        :class="[
+                                            location.dehumidifier_on ? 'text-blue-500' : 'text-gray-400',
+                                            loadingDehumidifier[location.id] ? 'opacity-50' : ''
+                                        ]"
+                                        @click="!loadingDehumidifier[location.id] && toggleDehumidifier(location.id, location.name, location.dehumidifier_on)" 
+                                    />
                                 </TableCell>
                                 <TableCell class="text-right whitespace-nowrap">
                                     <div class="flex justify-end gap-2">

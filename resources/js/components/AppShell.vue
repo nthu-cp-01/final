@@ -2,6 +2,7 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { usePage } from '@inertiajs/vue3';
 import { SharedData } from '@/types';
+import { Toaster } from '@/components/ui/sonner';
 
 interface Props {
     variant?: 'header' | 'sidebar';
@@ -19,4 +20,5 @@ const isOpen = usePage<SharedData>().props.sidebarOpen;
     <SidebarProvider v-else :default-open="isOpen">
         <slot />
     </SidebarProvider>
+    <Toaster class="pointer-events-auto" />
 </template>

@@ -105,4 +105,54 @@ class LocationController extends Controller
         return redirect()->route('locations.index')
             ->with('message', 'Location removed successfully.');
     }
+
+    /**
+     * Toggle air conditioner state for a location.
+     */
+    public function toggleAc(Location $location, LocationService $locationService)
+    {
+        try {
+            // Get current state
+            $currentState = $locationService->getThingShadow($location->deviceId, $location->shadowName);
+            
+            // Toggle the AC state
+            $newAcState = !($currentState['ac_is_enable'] ?? false);
+            
+            // Update the shadow with new state
+            $locationService->updateThingShadow(
+                $location->deviceId, 
+                $location->shadowName, 
+                ['ac_is_enable' => $newAcState]
+            );
+
+            return redirect()->back()->with('message', 'AC ' . ($newAcState ? 'enabled' : 'disabled') . ' successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to toggle AC: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Toggle dehumidifier state for a location.
+     */
+    public function toggleDehumidifier(Location $location, LocationService $locationService)
+    {
+        try {
+            // Get current state
+            $currentState = $locationService->getThingShadow($location->deviceId, $location->shadowName);
+            
+            // Toggle the dehumidifier state
+            $newDehumidifierState = !($currentState['dehumidifier_is_enable'] ?? false);
+            
+            // Update the shadow with new state
+            $locationService->updateThingShadow(
+                $location->deviceId, 
+                $location->shadowName, 
+                ['dehumidifier_is_enable' => $newDehumidifierState]
+            );
+
+            return redirect()->back()->with('message', 'Dehumidifier ' . ($newDehumidifierState ? 'enabled' : 'disabled') . ' successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to toggle dehumidifier: ' . $e->getMessage());
+        }
+    }
 }

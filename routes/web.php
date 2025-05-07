@@ -14,6 +14,8 @@ Route::get('dashboard', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('locations', LocationController::class);
+    Route::post('locations/{location}/toggle-ac', [LocationController::class, 'toggleAc'])->name('locations.toggle-ac');
+    Route::post('locations/{location}/toggle-dehumidifier', [LocationController::class, 'toggleDehumidifier'])->name('locations.toggle-dehumidifier');
 });
 
 require __DIR__.'/settings.php';
