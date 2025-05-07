@@ -3,7 +3,7 @@ resource "aws_ecs_cluster" "lab_app_cluster" {
   name = "lab-app-cluster"
 }
 resource "aws_ecs_capacity_provider" "lab_app_ec2_capacity_provider" {
-  name = "lab-app-capacity-provider"
+  name = "lab-app-capacity-provider-mod"
 
   auto_scaling_group_provider {
     auto_scaling_group_arn = aws_autoscaling_group.lab_ec2_autoscaling_group.arn
