@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { PlusCircle, Pencil, Trash2, Fan, Droplets, Thermometer, Gauge } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
+import { toast } from 'vue-sonner';
 import {
     Table,
     TableBody,
@@ -13,15 +14,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import { type BreadcrumbItem } from '@/types';
+import { ref, watch } from 'vue';
 
 interface Location {
     id: number;
@@ -37,7 +31,50 @@ interface Props {
     locations: Location[];
 }
 
-defineProps<Props>();
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = defineProps<Props>();
+const page = usePage();
+
+// Track loading states for each device control
+const loadingAc = ref<Record<number, boolean>>({});
+const loadingDehumidifier = ref<Record<number, boolean>>({});
+
+// Watch for flash messages from Inertia shared data
+watch(() => page.props.flash, (flash) => {
+    if (flash.success) {
+        toast.success(flash.message, {
+            description: flash.description || '',
+        });
+    }
+
+    if (flash.error) {
+        // Get detailed error information if available
+        const errorDetails = flash.errorDetails || {};
+        let errorDescription = '';
+
+        // Build a detailed error description
+        if (errorDetails.message) {
+            errorDescription = errorDetails.message;
+        }
+
+        // Add error code and type if available
+        if (errorDetails.code || errorDetails.type) {
+            errorDescription += errorDescription ? '\n' : '';
+            errorDescription += `Error ${errorDetails.code || ''}: ${errorDetails.type || ''}`;
+        }
+
+        // Add context info if available
+        if (errorDetails.context) {
+            const ctx = errorDetails.context;
+            errorDescription += errorDescription ? '\n' : '';
+            errorDescription += `Device: ${ctx.thingName || 'unknown'}`;
+        }
+
+        toast.error(flash.message, {
+            description: errorDescription || '',
+        });
+    }
+}, { immediate: true });
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -45,6 +82,38 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/locations',
     },
 ];
+
+// Handle toggle AC for a location
+const toggleAc = (locationId: number, locationName: string) => {
+    loadingAc.value[locationId] = true;
+
+    // Show loading toast
+    const toastId = toast.loading(`Updating AC for ${locationName}...`);
+
+    router.post(route('locations.toggle-ac', locationId), {}, {
+        onFinish: () => {
+            loadingAc.value[locationId] = false;
+            toast.dismiss(toastId);
+        },
+        preserveScroll: true,
+    });
+};
+
+// Handle toggle dehumidifier for a location
+const toggleDehumidifier = (locationId: number, locationName: string) => {
+    loadingDehumidifier.value[locationId] = true;
+
+    // Show loading toast
+    const toastId = toast.loading(`Updating dehumidifier for ${locationName}...`);
+
+    router.post(route('locations.toggle-dehumidifier', locationId), {}, {
+        onFinish: () => {
+            loadingDehumidifier.value[locationId] = false;
+            toast.dismiss(toastId);
+        },
+        preserveScroll: true,
+    });
+};
 </script>
 
 <template>
@@ -83,16 +152,16 @@ const breadcrumbs: BreadcrumbItem[] = [
                                         <span>Humidity</span>
                                     </div>
                                 </TableHead>
-                                <TableHead class="w-[8%]">
-                                    <div class="flex items-center gap-1">
+                                <TableHead class="w-[8%] text-center">
+                                    <div class="flex items-center justify-center gap-1">
                                         <Fan class="h-4 w-4" />
                                         <span>AC</span>
                                     </div>
                                 </TableHead>
-                                <TableHead class="w-[8%]">
-                                    <div class="flex items-center gap-1">
+                                <TableHead class="w-[8%] text-center">
+                                    <div class="flex items-center justify-center gap-1">
                                         <Droplets class="h-4 w-4" />
-                                        <span>Humidifier</span>
+                                        <span>Dehumidifier</span>
                                     </div>
                                 </TableHead>
                                 <TableHead class="w-[10%] text-right">Actions</TableHead>
@@ -111,17 +180,18 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 </TableCell>
                                 <TableCell>{{ location.temperature }}°C</TableCell>
                                 <TableCell>{{ location.humidity }}%</TableCell>
-                                <TableCell>
-                                    <div :class="location.ac_on ? 'text-green-500' : 'text-gray-400'"
-                                        class="flex justify-center">
-                                        <Fan class="h-5 w-5" />
-                                    </div>
+                                <TableCell class="text-center">
+                                    <Fan class="h-5 w-5 mx-auto cursor-pointer transition-colors" :class="[
+                                        location.ac_on ? 'text-green-500' : 'text-gray-400',
+                                        loadingAc[location.id] ? 'opacity-50' : ''
+                                    ]" @click="!loadingAc[location.id] && toggleAc(location.id, location.name)" />
                                 </TableCell>
-                                <TableCell>
-                                    <div :class="location.dehumidifier_on ? 'text-blue-500' : 'text-gray-400'"
-                                        class="flex justify-center">
-                                        <Droplets class="h-5 w-5" />
-                                    </div>
+                                <TableCell class="text-center">
+                                    <Droplets class="h-5 w-5 mx-auto cursor-pointer transition-colors" :class="[
+                                        location.dehumidifier_on ? 'text-blue-500' : 'text-gray-400',
+                                        loadingDehumidifier[location.id] ? 'opacity-50' : ''
+                                    ]"
+                                        @click="!loadingDehumidifier[location.id] && toggleDehumidifier(location.id, location.name)" />
                                 </TableCell>
                                 <TableCell class="text-right whitespace-nowrap">
                                     <div class="flex justify-end gap-2">

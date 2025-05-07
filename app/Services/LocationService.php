@@ -82,8 +82,20 @@ class LocationService
             // Log the error
             \Log::error('Failed to update thing shadow: ' . $e->getMessage());
 
-            // Re-throw the exception to let the controller handle it
-            throw $e;
+            // Create a structured error response with more details
+            $errorDetails = [
+                'message' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'type' => get_class($e),
+                'context' => [
+                    'thingName' => $thingName,
+                    'shadowName' => $shadowName,
+                    'operation' => 'updateThingShadow'
+                ]
+            ];
+            
+            // Re-throw as a new exception with the structured error details
+            throw new \Exception(json_encode($errorDetails), $e->getCode(), $e);
         }
     }
 }

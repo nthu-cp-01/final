@@ -94,16 +94,6 @@ resource "aws_ecs_service" "web_service" {
     weight            = 1
   }
 
-  network_configuration {
-    subnets = [
-      aws_subnet.lab_public_subnet_a.id,
-      aws_subnet.lab_public_subnet_b.id,
-    ]
-
-    security_groups  = [aws_security_group.ecs_sg.id]
-    assign_public_ip = false
-  }
-
   load_balancer {
     target_group_arn = aws_lb_target_group.lab_app_tg.arn
     container_name   = "final-app"
