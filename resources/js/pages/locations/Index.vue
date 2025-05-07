@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table';
 
 import { type BreadcrumbItem } from '@/types';
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 
 interface Location {
     id: number;
@@ -31,6 +31,7 @@ interface Props {
     locations: Location[];
 }
 
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<Props>();
 const page = usePage();
 
@@ -45,30 +46,30 @@ watch(() => page.props.flash, (flash) => {
             description: flash.description || '',
         });
     }
-    
+
     if (flash.error) {
         // Get detailed error information if available
         const errorDetails = flash.errorDetails || {};
         let errorDescription = '';
-        
+
         // Build a detailed error description
         if (errorDetails.message) {
             errorDescription = errorDetails.message;
         }
-        
+
         // Add error code and type if available
         if (errorDetails.code || errorDetails.type) {
             errorDescription += errorDescription ? '\n' : '';
             errorDescription += `Error ${errorDetails.code || ''}: ${errorDetails.type || ''}`;
         }
-        
+
         // Add context info if available
         if (errorDetails.context) {
             const ctx = errorDetails.context;
             errorDescription += errorDescription ? '\n' : '';
             errorDescription += `Device: ${ctx.thingName || 'unknown'}`;
         }
-        
+
         toast.error(flash.message, {
             description: errorDescription || '',
         });
@@ -83,12 +84,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 // Handle toggle AC for a location
-const toggleAc = (locationId: number, locationName: string, currentState: boolean) => {
+const toggleAc = (locationId: number, locationName: string) => {
     loadingAc.value[locationId] = true;
-    
+
     // Show loading toast
     const toastId = toast.loading(`Updating AC for ${locationName}...`);
-    
+
     router.post(route('locations.toggle-ac', locationId), {}, {
         onFinish: () => {
             loadingAc.value[locationId] = false;
@@ -99,12 +100,12 @@ const toggleAc = (locationId: number, locationName: string, currentState: boolea
 };
 
 // Handle toggle dehumidifier for a location
-const toggleDehumidifier = (locationId: number, locationName: string, currentState: boolean) => {
+const toggleDehumidifier = (locationId: number, locationName: string) => {
     loadingDehumidifier.value[locationId] = true;
-    
+
     // Show loading toast
     const toastId = toast.loading(`Updating dehumidifier for ${locationName}...`);
-    
+
     router.post(route('locations.toggle-dehumidifier', locationId), {}, {
         onFinish: () => {
             loadingDehumidifier.value[locationId] = false;
@@ -180,24 +181,17 @@ const toggleDehumidifier = (locationId: number, locationName: string, currentSta
                                 <TableCell>{{ location.temperature }}°C</TableCell>
                                 <TableCell>{{ location.humidity }}%</TableCell>
                                 <TableCell class="text-center">
-                                    <Fan 
-                                        class="h-5 w-5 mx-auto cursor-pointer transition-colors" 
-                                        :class="[
-                                            location.ac_on ? 'text-green-500' : 'text-gray-400',
-                                            loadingAc[location.id] ? 'opacity-50' : ''
-                                        ]"
-                                        @click="!loadingAc[location.id] && toggleAc(location.id, location.name, location.ac_on)" 
-                                    />
+                                    <Fan class="h-5 w-5 mx-auto cursor-pointer transition-colors" :class="[
+                                        location.ac_on ? 'text-green-500' : 'text-gray-400',
+                                        loadingAc[location.id] ? 'opacity-50' : ''
+                                    ]" @click="!loadingAc[location.id] && toggleAc(location.id, location.name)" />
                                 </TableCell>
                                 <TableCell class="text-center">
-                                    <Droplets 
-                                        class="h-5 w-5 mx-auto cursor-pointer transition-colors" 
-                                        :class="[
-                                            location.dehumidifier_on ? 'text-blue-500' : 'text-gray-400',
-                                            loadingDehumidifier[location.id] ? 'opacity-50' : ''
-                                        ]"
-                                        @click="!loadingDehumidifier[location.id] && toggleDehumidifier(location.id, location.name, location.dehumidifier_on)" 
-                                    />
+                                    <Droplets class="h-5 w-5 mx-auto cursor-pointer transition-colors" :class="[
+                                        location.dehumidifier_on ? 'text-blue-500' : 'text-gray-400',
+                                        loadingDehumidifier[location.id] ? 'opacity-50' : ''
+                                    ]"
+                                        @click="!loadingDehumidifier[location.id] && toggleDehumidifier(location.id, location.name)" />
                                 </TableCell>
                                 <TableCell class="text-right whitespace-nowrap">
                                     <div class="flex justify-end gap-2">
