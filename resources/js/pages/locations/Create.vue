@@ -24,7 +24,8 @@ const form = useForm({
     name: '',
     description: '',
     deviceId: '',
-    shadowName: '',
+    controllerShadowName: '',
+    sensorShadowName: '',
 });
 
 const submit = () => {
@@ -66,13 +67,23 @@ const submit = () => {
                     </div>
 
                     <div>
-                        <Label for="shadowName">Shadow Name</Label>
-                        <Input id="shadowName" v-model="form.shadowName" type="text" class="mt-1 block w-full"
+                        <Label for="controllerShadowName">Controller Shadow Name</Label>
+                        <Input id="controllerShadowName" v-model="form.controllerShadowName" type="text" class="mt-1 block w-full"
                             required />
                         <p class="text-sm text-muted-foreground mt-1">
-                            Identifier for the IoT device shadow associated with this location
+                            Identifier for the IoT device controller shadow that manages AC and dehumidifier
                         </p>
-                        <InputError :message="form.errors.shadowName" />
+                        <InputError :message="form.errors.controllerShadowName" />
+                    </div>
+
+                    <div>
+                        <Label for="sensorShadowName">Sensor Shadow Name</Label>
+                        <Input id="sensorShadowName" v-model="form.sensorShadowName" type="text" class="mt-1 block w-full"
+                            required />
+                        <p class="text-sm text-muted-foreground mt-1">
+                            Identifier for the IoT device sensor shadow that reports temperature and humidity
+                        </p>
+                        <InputError :message="form.errors.sensorShadowName" />
                     </div>
 
                     <div class="flex items-center justify-end gap-4">

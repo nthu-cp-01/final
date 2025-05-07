@@ -20,6 +20,7 @@ class Location extends Model
         'name',
         'description',
         'deviceId',
-        'shadowName',
+        'controllerShadowName',
+        'sensorShadowName',
     ];
 }

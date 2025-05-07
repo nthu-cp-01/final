@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('description');
             $table->string('deviceId');
-            $table->string('shadowName');
+            $table->string('controllerShadowName');
+            $table->string('sensorShadowName');
             $table->timestamps();
             $table->softDeletes();
         });

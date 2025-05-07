@@ -16,13 +16,14 @@ class LocationController extends Controller
     {
 
         $locations = Location::all()->map(function (Location $location) use ($locationService) {
-            $data = $locationService->getThingShadow($location->deviceId, $location->shadowName);
+            $controllerData = $locationService->getThingShadow($location->deviceId, $location->controllerShadowName);
+            $sensorData = $locationService->getThingShadow($location->deviceId, $location->sensorShadowName);
 
             return array_merge($location->toArray(), [
-                'temperature' => $data['temperature'],
-                'humidity' => $data['humidity'],
-                'ac_on' => $data['ac_is_enable'],
-                'dehumidifier_on' => $data['dehumidifier_is_enable'],
+                'temperature' => $sensorData['temperature'],
+                'humidity' => $sensorData['humidity'],
+                'ac_on' => $controllerData['ac_is_enable'],
+                'dehumidifier_on' => $controllerData['dehumidifier_is_enable'],
             ]);
         });
 
@@ -48,7 +49,8 @@ class LocationController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'deviceId' => 'required|string|max:255',
-            'shadowName' => 'required|string|max:255',
+            'controllerShadowName' => 'required|string|max:255',
+            'sensorShadowName' => 'required|string|max:255',
         ]);
 
         Location::create($validated);
@@ -86,7 +88,8 @@ class LocationController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'deviceId' => 'required|string|max:255',
-            'shadowName' => 'required|string|max:255',
+            'controllerShadowName' => 'required|string|max:255',
+            'sensorShadowName' => 'required|string|max:255',
         ]);
 
         $location->update($validated);
@@ -113,15 +116,15 @@ class LocationController extends Controller
     {
         try {
             // Get current state
-            $currentState = $locationService->getThingShadow($location->deviceId, $location->shadowName);
-            
+            $currentState = $locationService->getThingShadow($location->deviceId, $location->controllerShadowName);
+
             // Toggle the AC state
             $newAcState = !($currentState['ac_is_enable'] ?? false);
-            
+
             // Update the shadow with new state
             $locationService->updateThingShadow(
-                $location->deviceId, 
-                $location->shadowName, 
+                $location->deviceId,
+                $location->controllerShadowName,
                 ['ac_is_enable' => $newAcState]
             );
 
@@ -156,15 +159,15 @@ class LocationController extends Controller
     {
         try {
             // Get current state
-            $currentState = $locationService->getThingShadow($location->deviceId, $location->shadowName);
-            
+            $currentState = $locationService->getThingShadow($location->deviceId, $location->controllerShadowName);
+
             // Toggle the dehumidifier state
             $newDehumidifierState = !($currentState['dehumidifier_is_enable'] ?? false);
-            
+
             // Update the shadow with new state
             $locationService->updateThingShadow(
-                $location->deviceId, 
-                $location->shadowName, 
+                $location->deviceId,
+                $location->controllerShadowName,
                 ['dehumidifier_is_enable' => $newDehumidifierState]
             );
 
