@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, Link, router } from '@inertiajs/vue3';
-import { PlusCircle, Pencil, Trash2, Fan, Droplets, Thermometer, Gauge, PowerOff, Power } from 'lucide-vue-next';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { PlusCircle, Pencil, Trash2, Fan, Droplets, Thermometer, Gauge } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
 import { toast } from 'vue-sonner';
@@ -14,16 +14,8 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import { type BreadcrumbItem } from '@/types';
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 interface Location {
     id: number;
@@ -39,7 +31,49 @@ interface Props {
     locations: Location[];
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
+const page = usePage();
+
+// Track loading states for each device control
+const loadingAc = ref<Record<number, boolean>>({});
+const loadingDehumidifier = ref<Record<number, boolean>>({});
+
+// Watch for flash messages from Inertia shared data
+watch(() => page.props.flash, (flash) => {
+    if (flash.success) {
+        toast.success(flash.message, {
+            description: flash.description || '',
+        });
+    }
+    
+    if (flash.error) {
+        // Get detailed error information if available
+        const errorDetails = flash.errorDetails || {};
+        let errorDescription = '';
+        
+        // Build a detailed error description
+        if (errorDetails.message) {
+            errorDescription = errorDetails.message;
+        }
+        
+        // Add error code and type if available
+        if (errorDetails.code || errorDetails.type) {
+            errorDescription += errorDescription ? '\n' : '';
+            errorDescription += `Error ${errorDetails.code || ''}: ${errorDetails.type || ''}`;
+        }
+        
+        // Add context info if available
+        if (errorDetails.context) {
+            const ctx = errorDetails.context;
+            errorDescription += errorDescription ? '\n' : '';
+            errorDescription += `Device: ${ctx.thingName || 'unknown'}`;
+        }
+        
+        toast.error(flash.message, {
+            description: errorDescription || '',
+        });
+    }
+}, { immediate: true });
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -47,10 +81,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/locations',
     },
 ];
-
-// Track loading states for each device control
-const loadingAc = ref<Record<number, boolean>>({});
-const loadingDehumidifier = ref<Record<number, boolean>>({});
 
 // Handle toggle AC for a location
 const toggleAc = (locationId: number, locationName: string, currentState: boolean) => {
@@ -60,23 +90,9 @@ const toggleAc = (locationId: number, locationName: string, currentState: boolea
     const toastId = toast.loading(`Updating AC for ${locationName}...`);
     
     router.post(route('locations.toggle-ac', locationId), {}, {
-        onSuccess: () => {
+        onFinish: () => {
             loadingAc.value[locationId] = false;
-            
-            // Update toast on success
-            toast.success(`AC ${!currentState ? 'enabled' : 'disabled'} for ${locationName}`, {
-                id: toastId,
-                description: `Temperature control updated successfully`,
-            });
-        },
-        onError: (error) => {
-            loadingAc.value[locationId] = false;
-            
-            // Update toast on error
-            toast.error(`Failed to update AC for ${locationName}`, {
-                id: toastId,
-                description: error?.message || 'An error occurred while updating the device',
-            });
+            toast.dismiss(toastId);
         },
         preserveScroll: true,
     });
@@ -90,23 +106,9 @@ const toggleDehumidifier = (locationId: number, locationName: string, currentSta
     const toastId = toast.loading(`Updating dehumidifier for ${locationName}...`);
     
     router.post(route('locations.toggle-dehumidifier', locationId), {}, {
-        onSuccess: () => {
+        onFinish: () => {
             loadingDehumidifier.value[locationId] = false;
-            
-            // Update toast on success
-            toast.success(`Dehumidifier ${!currentState ? 'enabled' : 'disabled'} for ${locationName}`, {
-                id: toastId,
-                description: `Humidity control updated successfully`,
-            });
-        },
-        onError: (error) => {
-            loadingDehumidifier.value[locationId] = false;
-            
-            // Update toast on error
-            toast.error(`Failed to update dehumidifier for ${locationName}`, {
-                id: toastId,
-                description: error?.message || 'An error occurred while updating the device',
-            });
+            toast.dismiss(toastId);
         },
         preserveScroll: true,
     });

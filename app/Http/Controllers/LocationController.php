@@ -125,9 +125,27 @@ class LocationController extends Controller
                 ['ac_is_enable' => $newAcState]
             );
 
-            return redirect()->back()->with('message', 'AC ' . ($newAcState ? 'enabled' : 'disabled') . ' successfully.');
+            // Flash success message using Inertia's shared data
+            return redirect()->back()->with([
+                'success' => true,
+                'message' => 'AC ' . ($newAcState ? 'enabled' : 'disabled') . ' successfully.',
+                'new_state' => $newAcState
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to toggle AC: ' . $e->getMessage());
+            // Try to parse the error details if available
+            $errorDetails = [];
+            try {
+                $errorDetails = json_decode($e->getMessage(), true) ?: ['message' => $e->getMessage()];
+            } catch (\Exception $jsonError) {
+                $errorDetails = ['message' => $e->getMessage()];
+            }
+
+            // Flash error message using Inertia's shared data
+            return redirect()->back()->with([
+                'error' => true,
+                'message' => 'Failed to toggle AC',
+                'errorDetails' => $errorDetails
+            ]);
         }
     }
 
@@ -150,9 +168,27 @@ class LocationController extends Controller
                 ['dehumidifier_is_enable' => $newDehumidifierState]
             );
 
-            return redirect()->back()->with('message', 'Dehumidifier ' . ($newDehumidifierState ? 'enabled' : 'disabled') . ' successfully.');
+            // Flash success message using Inertia's shared data
+            return redirect()->back()->with([
+                'success' => true,
+                'message' => 'Dehumidifier ' . ($newDehumidifierState ? 'enabled' : 'disabled') . ' successfully.',
+                'new_state' => $newDehumidifierState
+            ]);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to toggle dehumidifier: ' . $e->getMessage());
+            // Try to parse the error details if available
+            $errorDetails = [];
+            try {
+                $errorDetails = json_decode($e->getMessage(), true) ?: ['message' => $e->getMessage()];
+            } catch (\Exception $jsonError) {
+                $errorDetails = ['message' => $e->getMessage()];
+            }
+
+            // Flash error message using Inertia's shared data
+            return redirect()->back()->with([
+                'error' => true,
+                'message' => 'Failed to toggle dehumidifier',
+                'errorDetails' => $errorDetails
+            ]);
         }
     }
 }
