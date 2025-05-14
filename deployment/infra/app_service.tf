@@ -64,6 +64,18 @@ resource "aws_ecs_task_definition" "laravel_app" {
 
         # Storage(swap with S3 maybe?)
         { name = "FILESYSTEM_DISK", value = "local" },
+
+        # Cognito
+        { name = "COGNITO_HOST", value = format(
+          "https://%s.auth.%s.amazoncognito.com",
+          aws_cognito_user_pool_domain.lab_user_pool_domain.domain,
+          "us-east-1"
+        ) },
+        { name = "COGNITO_CLIENT_ID", value = aws_cognito_user_pool_client.lab_user_pool_client.id },
+        { name = "COGNITO_CLIENT_SECRET", value = aws_cognito_user_pool_client.lab_user_pool_client.client_secret },
+        { name = "COGNITO_LOGIN_SCOPE", value = "openid,profile,email" },
+        { name = "COGNITO_CALLBACK_URL", value = format("%s/login/cognito/callback", aws_lb.lab_app_lb.dns_name) },
+        { name = "COGNITO_SIGN_OUT_URL", value = format("%s/login", aws_lb.lab_app_lb.dns_name) },
       ]
       logConfiguration = {
         logDriver = "awslogs",
