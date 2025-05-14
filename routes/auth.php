@@ -18,6 +18,10 @@ Route::middleware('guest')->group(function () {
 
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
+    Route::get('login/cognito', [AuthenticatedSessionController::class, 'cognito'])
+        ->name('login.cognito');
+    Route::get('login/cognito/callback', [AuthenticatedSessionController::class, 'cognitoCallback'])
+        ->name('login.cognito.callback');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
