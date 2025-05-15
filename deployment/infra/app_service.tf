@@ -74,8 +74,8 @@ resource "aws_ecs_task_definition" "laravel_app" {
         { name = "COGNITO_CLIENT_ID", value = aws_cognito_user_pool_client.lab_user_pool_client.id },
         { name = "COGNITO_CLIENT_SECRET", value = aws_cognito_user_pool_client.lab_user_pool_client.client_secret },
         { name = "COGNITO_LOGIN_SCOPE", value = "openid,profile,email" },
-        { name = "COGNITO_CALLBACK_URL", value = format("%s/login/cognito/callback", aws_lb.lab_app_lb.dns_name) },
-        { name = "COGNITO_SIGN_OUT_URL", value = format("%s/login", aws_lb.lab_app_lb.dns_name) },
+        { name = "COGNITO_CALLBACK_URL", value = format("https://%s/login/cognito/callback", aws_lb.lab_app_lb.dns_name) },
+        { name = "COGNITO_SIGN_OUT_URL", value = format("https://%s/login", aws_lb.lab_app_lb.dns_name) },
       ]
       logConfiguration = {
         logDriver = "awslogs",
