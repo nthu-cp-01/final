@@ -27,17 +27,23 @@ resource "aws_cognito_user_pool_client" "lab_user_pool_client" {
   ]
 
   logout_urls = [
-    "https://final.test/login",
+    format(
+      "https://%s/login",
+      aws_lb.lab_app_lb.dns_name
+    ),
   ]
   callback_urls = [
-    "https://final.test/login/cognito/callback",
+    format(
+      "https://%s/login/cognito/callback",
+      aws_lb.lab_app_lb.dns_name
+    ),
   ]
 }
 
 resource "aws_cognito_resource_server" "lab_resource_server" {
   name         = "final_app_resource_server"
   user_pool_id = aws_cognito_user_pool.lab_user_pool.id
-  identifier   = "https://final.test"
+  identifier   = format("https://%s", aws_lb.lab_app_lb.dns_name)
 }
 
 resource "aws_cognito_user" "lab_cognito_user" {
