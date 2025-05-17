@@ -1,7 +1,34 @@
 resource "aws_cognito_user_pool" "lab_user_pool" {
   name = "the_final"
 
-  alias_attributes = ["email"]
+  username_attributes      = ["email"]
+  auto_verified_attributes = ["email"]
+
+  schema {
+    name                = "name"
+    required            = true
+    attribute_data_type = "String"
+
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 255
+    }
+  }
+
+  username_configuration {
+    case_sensitive = true
+  }
+
+  admin_create_user_config {
+    allow_admin_create_user_only = false
+  }
+  password_policy {
+    minimum_length    = 8
+    require_uppercase = false
+    require_lowercase = false
+    require_numbers   = false
+    require_symbols   = false
+  }
 }
 
 resource "aws_cognito_user_pool_domain" "lab_user_pool_domain" {
@@ -44,30 +71,4 @@ resource "aws_cognito_resource_server" "lab_resource_server" {
   name         = "final_app_resource_server"
   user_pool_id = aws_cognito_user_pool.lab_user_pool.id
   identifier   = format("https://%s", aws_lb.lab_app_lb.dns_name)
-}
-
-resource "aws_cognito_user" "lab_cognito_user" {
-  user_pool_id = aws_cognito_user_pool.lab_user_pool.id
-
-  username = "frank"
-  password = "!CoffeeIsGreat34"
-
-  attributes = {
-    name           = "Frank"
-    email          = "frank@test.com"
-    email_verified = true
-  }
-}
-
-resource "aws_cognito_user" "lab_cognito_user_test" {
-  user_pool_id = aws_cognito_user_pool.lab_user_pool.id
-
-  username = "test"
-  password = "Aoeuaoeu_123"
-
-  attributes = {
-    name           = "Test User"
-    email          = "test@test.com"
-    email_verified = true
-  }
 }

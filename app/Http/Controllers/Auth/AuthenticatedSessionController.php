@@ -74,7 +74,7 @@ class AuthenticatedSessionController extends Controller
             ['email' => $cognitoUser->email],
             [
                 'provider_id' => $cognitoUser->id,
-                'name' => $cognitoUser->user['name'],
+                'name' => $cognitoUser->user['name'] ?? 'Cognito User',
                 'email' => $cognitoUser->user['email'],
                 'email_verified_at' => $cognitoUser->user['email_verified'] ? now() : null,
             ]
