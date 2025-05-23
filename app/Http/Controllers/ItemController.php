@@ -17,7 +17,7 @@ class ItemController extends Controller
     {
         $items = Item::with(['manager', 'location', 'owner'])->get();
         
-        return Inertia::render('Items/Index', [
+        return Inertia::render('items/Index', [
             'items' => $items
         ]);
     }
@@ -30,7 +30,7 @@ class ItemController extends Controller
         $locations = Location::all();
         $users = User::all();
         
-        return Inertia::render('Items/Create', [
+        return Inertia::render('items/Create', [
             'locations' => $locations,
             'users' => $users,
         ]);
@@ -51,6 +51,15 @@ class ItemController extends Controller
             'status' => 'required|in:registered,normal,gone',
         ]);
 
+        // If no manager_id or owner_id is provided, use the authenticated user
+        if (empty($validated['manager_id'])) {
+            $validated['manager_id'] = auth()->id();
+        }
+        
+        if (empty($validated['owner_id'])) {
+            $validated['owner_id'] = auth()->id();
+        }
+
         $item = Item::create($validated);
 
         return redirect()
@@ -63,7 +72,7 @@ class ItemController extends Controller
      */
     public function show(Item $item)
     {
-        return Inertia::render('Items/Show', [
+        return Inertia::render('items/Show', [
             'item' => $item->load(['manager', 'location', 'owner']),
         ]);
     }
@@ -76,7 +85,7 @@ class ItemController extends Controller
         $locations = Location::all();
         $users = User::all();
         
-        return Inertia::render('Items/Edit', [
+        return Inertia::render('items/Edit', [
             'item' => $item,
             'locations' => $locations,
             'users' => $users,
