@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -45,5 +46,21 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the items managed by the user.
+     */
+    public function managedItems()
+    {
+        return $this->hasMany(Item::class, 'manager_id');
+    }
+
+    /**
+     * Get the items owned by the user.
+     */
+    public function ownedItems()
+    {
+        return $this->hasMany(Item::class, 'owner_id');
     }
 }
