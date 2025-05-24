@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { 
+import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
-    SelectValue 
+    SelectValue
 } from '@/components/ui/select';
 import InputError from '@/components/InputError.vue';
 import Heading from '@/components/Heading.vue';
@@ -31,6 +31,7 @@ interface Props {
     locations: Location[];
 }
 
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<Props>();
 const page = usePage();
 const auth = page.props.auth as { user: User };
@@ -63,6 +64,7 @@ const submit = () => {
 </script>
 
 <template>
+
     <Head title="Create Item" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
@@ -80,7 +82,8 @@ const submit = () => {
 
                     <div>
                         <Label for="purchase_date">Purchase Date</Label>
-                        <Input id="purchase_date" v-model="form.purchase_date" type="date" class="mt-1 block w-full" required />
+                        <Input id="purchase_date" v-model="form.purchase_date" type="date" class="mt-1 block w-full"
+                            required />
                         <InputError :message="form.errors.purchase_date" />
                     </div>
 
@@ -97,7 +100,8 @@ const submit = () => {
                                 <SelectValue placeholder="Select a location" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem v-for="location in locations" :key="location.id" :value="String(location.id)">
+                                <SelectItem v-for="location in locations" :key="location.id"
+                                    :value="String(location.id)">
                                     {{ location.name }}
                                 </SelectItem>
                             </SelectContent>

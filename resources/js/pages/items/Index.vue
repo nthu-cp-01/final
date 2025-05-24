@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { PlusCircle, Pencil, Trash2, PackageCheck, BadgeMinus, BadgeAlert } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem } from '@/types';
-import { ref, watch } from 'vue';
+import { watch } from 'vue';
 import { formatDate } from '@/lib/utils';
 
 interface User {
@@ -44,6 +44,7 @@ interface Props {
     items: Item[];
 }
 
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<Props>();
 const page = usePage();
 
@@ -67,7 +68,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 // Function to get status badge variant
 const getStatusBadge = (status: string) => {
-    switch(status) {
+    switch (status) {
         case 'registered':
             return { variant: 'secondary', icon: BadgeAlert };
         case 'normal':
@@ -81,6 +82,7 @@ const getStatusBadge = (status: string) => {
 </script>
 
 <template>
+
     <Head title="Items" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
@@ -88,10 +90,10 @@ const getStatusBadge = (status: string) => {
             <div class="flex items-center justify-between">
                 <Heading title="Items" description="Manage inventory items" />
                 <Link :href="route('items.create')" as="button">
-                    <Button>
-                        <PlusCircle class="mr-2 h-4 w-4" />
-                        Add Item
-                    </Button>
+                <Button>
+                    <PlusCircle class="mr-2 h-4 w-4" />
+                    Add Item
+                </Button>
                 </Link>
             </div>
 
@@ -119,19 +121,20 @@ const getStatusBadge = (status: string) => {
                             <TableRow v-for="item in items" :key="item.id">
                                 <TableCell class="font-medium">
                                     <Link :href="route('items.show', item.id)" class="hover:underline">
-                                        {{ item.name }}
+                                    {{ item.name }}
                                     </Link>
                                 </TableCell>
                                 <TableCell>{{ formatDate(item.purchase_date) }}</TableCell>
                                 <TableCell>
                                     <Badge :variant="getStatusBadge(item.status).variant">
-                                        <component :is="getStatusBadge(item.status).icon" class="mr-1 h-3 w-3" v-if="getStatusBadge(item.status).icon" />
+                                        <component :is="getStatusBadge(item.status).icon" class="mr-1 h-3 w-3"
+                                            v-if="getStatusBadge(item.status).icon" />
                                         {{ item.status.charAt(0).toUpperCase() + item.status.slice(1) }}
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
                                     <Link :href="route('locations.show', item.location.id)" class="hover:underline">
-                                        {{ item.location.name }}
+                                    {{ item.location.name }}
                                     </Link>
                                 </TableCell>
                                 <TableCell>{{ item.manager.name }}</TableCell>
@@ -139,17 +142,17 @@ const getStatusBadge = (status: string) => {
                                 <TableCell class="text-right whitespace-nowrap">
                                     <div class="flex justify-end gap-2">
                                         <Link :href="route('items.edit', item.id)" as="button">
-                                            <Button variant="outline" size="icon">
-                                                <Pencil class="h-4 w-4" />
-                                                <span class="sr-only">Edit</span>
-                                            </Button>
+                                        <Button variant="outline" size="icon">
+                                            <Pencil class="h-4 w-4" />
+                                            <span class="sr-only">Edit</span>
+                                        </Button>
                                         </Link>
-                                        <Link :href="route('items.destroy', item.id)" method="delete"
-                                            as="button" preserve-scroll>
-                                            <Button variant="outline" size="icon">
-                                                <Trash2 class="h-4 w-4" />
-                                                <span class="sr-only">Delete</span>
-                                            </Button>
+                                        <Link :href="route('items.destroy', item.id)" method="delete" as="button"
+                                            preserve-scroll>
+                                        <Button variant="outline" size="icon">
+                                            <Trash2 class="h-4 w-4" />
+                                            <span class="sr-only">Delete</span>
+                                        </Button>
                                         </Link>
                                     </div>
                                 </TableCell>
