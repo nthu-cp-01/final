@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ImportItemsRequest;
+use App\Jobs\ProcessItemsImport;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\User;
@@ -124,5 +126,31 @@ class ItemController extends Controller
         return redirect()
             ->route('items.index')
             ->with('success', 'Item deleted successfully.');
+    }
+
+    /**
+     * Show the import form.
+     */
+    public function import()
+    {
+        return Inertia::render('items/Import');
+    }
+
+    /**
+     * Process the CSV import.
+     */
+    public function processImport(ImportItemsRequest $request)
+    {
+        $file = $request->file('csv_file');
+        
+        // Store the file temporarily
+        $filePath = $file->store('imports', 'local');
+        
+        // Dispatch the job to process the import
+        ProcessItemsImport::dispatch($filePath, auth()->id());
+        
+        return redirect()
+            ->route('items.index')
+            ->with('success', 'CSV import has been queued for processing. Items will appear shortly.');
     }
 }

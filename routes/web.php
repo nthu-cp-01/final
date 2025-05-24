@@ -19,6 +19,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('locations/{location}/toggle-dehumidifier', [LocationController::class, 'toggleDehumidifier'])->name('locations.toggle-dehumidifier');
     
     Route::resource('items', ItemController::class);
+    Route::get('items-import', [ItemController::class, 'import'])->name('items.import');
+    Route::post('items-import', [ItemController::class, 'processImport'])->name('items.import.process');
 });
 
 require __DIR__.'/settings.php';

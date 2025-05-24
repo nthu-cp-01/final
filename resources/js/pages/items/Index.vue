@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { PlusCircle, Pencil, Trash2, PackageCheck, BadgeMinus, BadgeAlert } from 'lucide-vue-next';
+import { PlusCircle, Pencil, Trash2, PackageCheck, BadgeMinus, BadgeAlert, Upload } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
 import { toast } from 'vue-sonner';
@@ -89,12 +89,20 @@ const getStatusBadge = (status: string) => {
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex items-center justify-between">
                 <Heading title="Items" description="Manage inventory items" />
-                <Link :href="route('items.create')" as="button">
-                <Button>
-                    <PlusCircle class="mr-2 h-4 w-4" />
-                    Add Item
-                </Button>
-                </Link>
+                <div class="flex gap-2">
+                    <Link :href="route('items.import')" as="button">
+                        <Button variant="outline">
+                            <Upload class="mr-2 h-4 w-4" />
+                            Import CSV
+                        </Button>
+                    </Link>
+                    <Link :href="route('items.create')" as="button">
+                        <Button>
+                            <PlusCircle class="mr-2 h-4 w-4" />
+                            Add Item
+                        </Button>
+                    </Link>
+                </div>
             </div>
 
             <div
