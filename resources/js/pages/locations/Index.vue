@@ -174,7 +174,11 @@ const toggleDehumidifier = (locationId: number, locationName: string) => {
                                 </TableCell>
                             </TableRow>
                             <TableRow v-for="location in locations" :key="location.id">
-                                <TableCell class="font-medium">{{ location.name }}</TableCell>
+                                <TableCell class="font-medium">
+                                    <Link :href="route('locations.show', location.id)" class="hover:underline">
+                                    {{ location.name }}
+                                    </Link>
+                                </TableCell>
                                 <TableCell class="max-w-0">
                                     <div class="truncate">{{ location.description }}</div>
                                 </TableCell>

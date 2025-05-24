@@ -20,6 +20,8 @@ class LocationFactory extends Factory
             'name' => fake()->unique()->city(),
             'description' => fake()->sentence(10),
             'deviceId' => 'device_' . fake()->unique()->regexify('[A-Za-z0-9]{10}'),
+            'controllerShadowName' => fake()->unique()->word(),
+            'sensorShadowName' => fake()->unique()->word(),
         ];
     }
 }

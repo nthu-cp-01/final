@@ -1,0 +1,6 @@
+name,description,purchase_date,location,manager,owner,status
+"Laptop Dell XPS 13","High-performance laptop for development",2024-01-15,"Testing Location in R744","","",registered
+"Monitor Samsung 27 inch","4K display monitor",2024-02-01,"Testing Location in R744","","",registered
+"Wireless Mouse","Ergonomic wireless mouse",2024-01-20,"Testing Location in R744","","",registered
+"Keyboard Mechanical","RGB mechanical keyboard",2024-02-15,"Testing Location in R744","","",registered
+"Webcam Logitech C920","HD webcam for video calls",2024-03-01,"Testing Location in R744","","",registered
