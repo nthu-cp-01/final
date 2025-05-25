@@ -124,7 +124,7 @@ const handleFileChange = (event: Event) => {
                                     <li>• <code class="bg-muted px-1 rounded">purchase_date</code> - Purchase date (YYYY-MM-DD)</li>
                                     <li>• <code class="bg-muted px-1 rounded">manager</code> - Manager name or email</li>
                                     <li>• <code class="bg-muted px-1 rounded">owner</code> - Owner name or email</li>
-                                    <li>• <code class="bg-muted px-1 rounded">status</code> - registered, normal, or gone</li>
+                                    <li>• <code class="bg-muted px-1 rounded">status</code> - registered, normal, reserved, or gone</li>
                                 </ul>
                             </div>
                         </div>
@@ -142,7 +142,7 @@ const handleFileChange = (event: Event) => {
                             <div class="bg-muted p-3 rounded text-xs font-mono">
                                 name,description,purchase_date,location,manager,owner,status<br>
                                 Laptop A,Dell Laptop,2024-01-15,Office A,john@example.com,jane@example.com,normal<br>
-                                Monitor B,24-inch Monitor,2024-02-01,Office B,,,registered
+                                Monitor B,24-inch Monitor,2024-02-01,Office B,,,reserved
                             </div>
                         </div>
                     </CardContent>

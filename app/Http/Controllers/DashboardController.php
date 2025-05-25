@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use App\Models\LoaningForm;
 use App\Models\Location;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -18,8 +19,16 @@ class DashboardController extends Controller
             'items_count' => Item::count(),
         ];
 
+        // Get requested loaning forms for the dashboard
+        $requestedLoaningForms = LoaningForm::with(['item.owner', 'item.manager', 'applicant'])
+            ->where('status', 'requested')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
         return Inertia::render('Dashboard', [
-            'stats' => $stats
+            'stats' => $stats,
+            'requestedLoaningForms' => $requestedLoaningForms
         ]);
     }
 }

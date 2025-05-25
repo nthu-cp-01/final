@@ -63,4 +63,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Item::class, 'owner_id');
     }
+
+    /**
+     * Get the loaning forms submitted by this user.
+     */
+    public function loaningForms(): HasMany
+    {
+        return $this->hasMany(LoaningForm::class, 'applicant_id');
+    }
 }

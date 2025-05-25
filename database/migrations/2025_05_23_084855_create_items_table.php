@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('manager_id')->constrained('users');
             $table->foreignId('location_id')->constrained('locations');
             $table->foreignId('owner_id')->constrained('users');
-            $table->enum('status', ['registered', 'normal', 'gone'])->default('registered');
+            $table->enum('status', ['registered', 'normal', 'reserved', 'gone'])->default('registered');
             $table->timestamps();
             $table->softDeletes();
         });

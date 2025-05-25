@@ -148,6 +148,7 @@ const submit = () => {
                             <SelectContent>
                                 <SelectItem value="registered">Registered</SelectItem>
                                 <SelectItem value="normal">Normal</SelectItem>
+                                <SelectItem value="reserved">Reserved</SelectItem>
                                 <SelectItem value="gone">Gone</SelectItem>
                             </SelectContent>
                         </Select>

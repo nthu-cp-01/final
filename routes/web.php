@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\LoaningFormController;
 use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -20,6 +21,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('items', ItemController::class);
     Route::get('items-import', [ItemController::class, 'import'])->name('items.import');
     Route::post('items-import', [ItemController::class, 'processImport'])->name('items.import.process');
+    
+    Route::resource('loaning-forms', LoaningFormController::class);
+    Route::post('loaning-forms/{loaningForm}/approve', [LoaningFormController::class, 'approve'])->name('loaning-forms.approve');
+    Route::post('loaning-forms/{loaningForm}/reject', [LoaningFormController::class, 'reject'])->name('loaning-forms.reject');
 });
 
 require __DIR__.'/settings.php';
