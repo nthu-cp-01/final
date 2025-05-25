@@ -18,7 +18,7 @@ class ItemController extends Controller
     public function index()
     {
         $items = Item::with(['manager', 'location', 'owner'])->get();
-        
+
         return Inertia::render('items/Index', [
             'items' => $items
         ]);
@@ -31,7 +31,7 @@ class ItemController extends Controller
     {
         $locations = Location::all();
         $users = User::all();
-        
+
         return Inertia::render('items/Create', [
             'locations' => $locations,
             'users' => $users,
@@ -50,14 +50,14 @@ class ItemController extends Controller
             'manager_id' => 'required|exists:users,id',
             'location_id' => 'required|exists:locations,id',
             'owner_id' => 'required|exists:users,id',
-            'status' => 'required|in:registered,normal,gone',
+            'status' => 'required|in:registered,normal,reserved,gone',
         ]);
 
         // If no manager_id or owner_id is provided, use the authenticated user
         if (empty($validated['manager_id'])) {
             $validated['manager_id'] = auth()->id();
         }
-        
+
         if (empty($validated['owner_id'])) {
             $validated['owner_id'] = auth()->id();
         }
@@ -86,7 +86,7 @@ class ItemController extends Controller
     {
         $locations = Location::all();
         $users = User::all();
-        
+
         return Inertia::render('items/Edit', [
             'item' => $item,
             'locations' => $locations,
@@ -106,7 +106,7 @@ class ItemController extends Controller
             'manager_id' => 'required|exists:users,id',
             'location_id' => 'required|exists:locations,id',
             'owner_id' => 'required|exists:users,id',
-            'status' => 'required|in:registered,normal,gone',
+            'status' => 'required|in:registered,normal,reserved,gone',
         ]);
 
         $item->update($validated);
@@ -142,13 +142,13 @@ class ItemController extends Controller
     public function processImport(ImportItemsRequest $request)
     {
         $file = $request->file('csv_file');
-        
+
         // Store the file temporarily
         $filePath = $file->store('imports', 'local');
-        
+
         // Dispatch the job to process the import
         ProcessItemsImport::dispatch($filePath, auth()->id());
-        
+
         return redirect()
             ->route('items.index')
             ->with('success', 'CSV import has been queued for processing. Items will appear shortly.');
