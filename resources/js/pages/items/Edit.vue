@@ -35,7 +35,7 @@ interface Item {
     manager_id: number;
     location_id: number;
     owner_id: number;
-    status: 'registered' | 'normal' | 'gone';
+    status: 'registered' | 'normal' | 'gone' | 'reserved';
 }
 
 interface Props {
@@ -154,6 +154,7 @@ const submit = () => {
                             <SelectContent>
                                 <SelectItem value="registered">Registered</SelectItem>
                                 <SelectItem value="normal">Normal</SelectItem>
+                                <SelectItem value="reserved">Reserved</SelectItem>
                                 <SelectItem value="gone">Gone</SelectItem>
                             </SelectContent>
                         </Select>

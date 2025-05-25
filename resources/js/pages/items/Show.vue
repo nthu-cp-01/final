@@ -5,7 +5,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Heading from '@/components/Heading.vue';
-import { Pencil, PackageCheck, BadgeMinus, BadgeAlert } from 'lucide-vue-next';
+import { Pencil, PackageCheck, BadgeMinus, BadgeAlert, Lock } from 'lucide-vue-next';
 import { formatDate } from '@/lib/utils';
 
 interface User {
@@ -24,7 +24,7 @@ interface Item {
     name: string;
     purchase_date: string;
     description: string;
-    status: 'registered' | 'normal' | 'gone';
+    status: 'registered' | 'normal' | 'gone' | 'reserved';
     manager: User;
     owner: User;
     location: Location;
@@ -58,6 +58,8 @@ const getStatusBadge = (status: string) => {
             return { variant: 'success', icon: PackageCheck, label: 'Normal' };
         case 'gone':
             return { variant: 'destructive', icon: BadgeMinus, label: 'Gone' };
+        case 'reserved':
+            return { variant: 'default', icon: Lock, label: 'Reserved' };
         default:
             return { variant: 'outline', icon: null, label: status };
     }

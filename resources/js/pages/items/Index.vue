@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { PlusCircle, Pencil, Trash2, PackageCheck, BadgeMinus, BadgeAlert, Upload } from 'lucide-vue-next';
+import { PlusCircle, Pencil, Trash2, PackageCheck, BadgeMinus, BadgeAlert, Lock, Upload } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
 import { toast } from 'vue-sonner';
@@ -34,7 +34,7 @@ interface Item {
     name: string;
     purchase_date: string;
     description: string;
-    status: 'registered' | 'normal' | 'gone';
+    status: 'registered' | 'normal' | 'gone' | 'reserved';
     manager: User;
     owner: User;
     location: Location;
@@ -75,6 +75,8 @@ const getStatusBadge = (status: string) => {
             return { variant: 'success', icon: PackageCheck };
         case 'gone':
             return { variant: 'destructive', icon: BadgeMinus };
+        case 'reserved':
+            return { variant: 'default', icon: Lock };
         default:
             return { variant: 'outline', icon: null };
     }
