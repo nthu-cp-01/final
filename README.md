@@ -1,4 +1,7 @@
 # API使用指南
+- 目前規劃的出借流程如[圖](https://excalidraw.com/#json=RBsH2rmJFH9zmCvb0ZRzR,y-RMQDe5B3bHHGnrqVIAFw):
+![image](https://github.com/user-attachments/assets/3c25a926-a99d-478f-b8f3-d665f5b90b02)
+
 
 ## 0. 登入你要掃描的使用者身份，並去Settings->API Tokens去產生你驗證用的token
 - 如果要測試掃描流程，可以先用`bob@test.com`, `aoeuaoeu`這個帳號登入，然後產生API Token。
