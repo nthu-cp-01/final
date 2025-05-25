@@ -15,6 +15,10 @@ const sidebarNavItems: NavItem[] = [
         href: '/settings/password',
     },
     {
+        title: 'API Tokens',
+        href: '/settings/api-tokens',
+    },
+    {
         title: 'Appearance',
         href: '/settings/appearance',
     },
@@ -22,7 +26,7 @@ const sidebarNavItems: NavItem[] = [
 
 const page = usePage();
 
-const currentPath = page.props.ziggy?.location ? new URL(page.props.ziggy.location).pathname : '';
+const currentPath = (page.props.ziggy as any)?.location ? new URL((page.props.ziggy as any).location).pathname : '';
 </script>
 
 <template>
