@@ -2,7 +2,6 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
     Select,
@@ -40,6 +39,7 @@ interface Props {
     items: Item[];
 }
 
+ 
 const props = defineProps<Props>();
 
 const form = useForm({
@@ -63,16 +63,17 @@ const submit = () => {
 </script>
 
 <template>
+
     <Head title="Edit Loaning Request" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex items-center gap-4">
                 <Link :href="route('loaning-forms.index')" as="button">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft class="mr-2 h-4 w-4" />
-                        Back
-                    </Button>
+                <Button variant="outline" size="sm">
+                    <ArrowLeft class="mr-2 h-4 w-4" />
+                    Back
+                </Button>
                 </Link>
                 <Heading title="Edit Loaning Request" :description="`Edit loaning request #${loaningForm.id}`" />
             </div>
@@ -87,11 +88,7 @@ const submit = () => {
                                     <SelectValue placeholder="Choose an item..." />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem 
-                                        v-for="item in items" 
-                                        :key="item.id" 
-                                        :value="item.id.toString()"
-                                    >
+                                    <SelectItem v-for="item in items" :key="item.id" :value="item.id.toString()">
                                         <div class="flex flex-col">
                                             <span class="font-medium">{{ item.name }}</span>
                                             <span class="text-sm text-muted-foreground">
@@ -108,7 +105,7 @@ const submit = () => {
 
                         <div class="flex justify-end space-x-2">
                             <Link :href="route('loaning-forms.index')" as="button">
-                                <Button variant="outline">Cancel</Button>
+                            <Button variant="outline">Cancel</Button>
                             </Link>
                             <Button type="submit" :disabled="form.processing">
                                 Update Request

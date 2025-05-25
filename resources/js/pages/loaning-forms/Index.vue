@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { PlusCircle, Eye, Pencil, Trash2, Check, X } from 'lucide-vue-next';
+import { PlusCircle, Eye, Pencil, Trash2 } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
 import { toast } from 'vue-sonner';
@@ -53,6 +53,7 @@ interface Props {
     loaningForms: PaginatedLoaningForms;
 }
 
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<Props>();
 const page = usePage();
 
@@ -90,6 +91,7 @@ const getStatusBadge = (status: string) => {
 </script>
 
 <template>
+
     <Head title="Loaning Forms" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
@@ -97,14 +99,15 @@ const getStatusBadge = (status: string) => {
             <div class="flex items-center justify-between">
                 <Heading title="Loaning Forms" description="Manage item loaning requests" />
                 <Link :href="route('loaning-forms.create')" as="button">
-                    <Button>
-                        <PlusCircle class="mr-2 h-4 w-4" />
-                        Submit New Request
-                    </Button>
+                <Button>
+                    <PlusCircle class="mr-2 h-4 w-4" />
+                    Submit New Request
+                </Button>
                 </Link>
             </div>
 
-            <div class="overflow-x-auto border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-black rounded-xl">
+            <div
+                class="overflow-x-auto border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-black rounded-xl">
                 <div class="p-6">
                     <Table>
                         <TableHeader>
@@ -146,31 +149,25 @@ const getStatusBadge = (status: string) => {
                                 <TableCell>
                                     <div class="flex justify-end gap-2">
                                         <Link :href="route('loaning-forms.show', loaningForm.id)" as="button">
-                                            <Button variant="outline" size="sm">
-                                                <Eye class="h-4 w-4" />
-                                            </Button>
+                                        <Button variant="outline" size="sm">
+                                            <Eye class="h-4 w-4" />
+                                        </Button>
                                         </Link>
-                                        
-                                        <Link 
-                                            v-if="loaningForm.status === 'requested'" 
-                                            :href="route('loaning-forms.edit', loaningForm.id)" 
-                                            as="button"
-                                        >
-                                            <Button variant="outline" size="sm">
-                                                <Pencil class="h-4 w-4" />
-                                            </Button>
+
+                                        <Link v-if="loaningForm.status === 'requested'"
+                                            :href="route('loaning-forms.edit', loaningForm.id)" as="button">
+                                        <Button variant="outline" size="sm">
+                                            <Pencil class="h-4 w-4" />
+                                        </Button>
                                         </Link>
-                                        
-                                        <Link 
-                                            v-if="loaningForm.status === 'requested'" 
-                                            :href="route('loaning-forms.destroy', loaningForm.id)" 
-                                            method="delete"
+
+                                        <Link v-if="loaningForm.status === 'requested'"
+                                            :href="route('loaning-forms.destroy', loaningForm.id)" method="delete"
                                             as="button"
-                                            :onBefore="() => confirm('Are you sure you want to delete this loaning form?')"
-                                        >
-                                            <Button variant="destructive" size="sm">
-                                                <Trash2 class="h-4 w-4" />
-                                            </Button>
+                                            :onBefore="() => confirm('Are you sure you want to delete this loaning form?')">
+                                        <Button variant="destructive" size="sm">
+                                            <Trash2 class="h-4 w-4" />
+                                        </Button>
                                         </Link>
                                     </div>
                                 </TableCell>
@@ -179,9 +176,9 @@ const getStatusBadge = (status: string) => {
                     </Table>
 
                     <div v-if="loaningForms.data.length === 0" class="py-8 text-center text-muted-foreground">
-                        No loaning forms found. 
+                        No loaning forms found.
                         <Link :href="route('loaning-forms.create')" class="text-primary hover:underline">
-                            Submit your first request
+                        Submit your first request
                         </Link>
                     </div>
                 </div>
@@ -190,8 +187,8 @@ const getStatusBadge = (status: string) => {
             <!-- Pagination would go here if needed -->
             <div v-if="loaningForms.last_page > 1" class="flex justify-center">
                 <div class="text-sm text-muted-foreground">
-                    Showing {{ (loaningForms.current_page - 1) * loaningForms.per_page + 1 }} to 
-                    {{ Math.min(loaningForms.current_page * loaningForms.per_page, loaningForms.total) }} 
+                    Showing {{ (loaningForms.current_page - 1) * loaningForms.per_page + 1 }} to
+                    {{ Math.min(loaningForms.current_page * loaningForms.per_page, loaningForms.total) }}
                     of {{ loaningForms.total }} results
                 </div>
             </div>

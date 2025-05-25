@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Heading from '@/components/Heading.vue';
 import { type BreadcrumbItem } from '@/types';
-import { ArrowLeft, Check, X, Calendar } from 'lucide-vue-next';
+import { ArrowLeft, Check, X } from 'lucide-vue-next';
 import { formatDate } from '@/lib/utils';
 
 interface User {
@@ -78,16 +78,17 @@ const reject = () => {
 </script>
 
 <template>
+
     <Head title="Loaning Request Details" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
             <div class="flex items-center gap-4">
                 <Link :href="route('loaning-forms.index')" as="button">
-                    <Button variant="outline" size="sm">
-                        <ArrowLeft class="mr-2 h-4 w-4" />
-                        Back
-                    </Button>
+                <Button variant="outline" size="sm">
+                    <ArrowLeft class="mr-2 h-4 w-4" />
+                    Back
+                </Button>
                 </Link>
                 <Heading title="Loaning Request Details" :description="`Request #${loaningForm.id}`" />
             </div>
@@ -114,13 +115,13 @@ const reject = () => {
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div>
                             <Label class="text-sm font-medium text-muted-foreground">Submitted By</Label>
                             <p class="text-sm">{{ loaningForm.applicant.name }}</p>
                             <p class="text-xs text-muted-foreground">{{ loaningForm.applicant.email }}</p>
                         </div>
-                        
+
                         <div>
                             <Label class="text-sm font-medium text-muted-foreground">Submitted On</Label>
                             <p class="text-sm">{{ formatDate(loaningForm.created_at) }}</p>
@@ -150,18 +151,18 @@ const reject = () => {
                             <Label class="text-sm font-medium text-muted-foreground">Item Name</Label>
                             <p class="text-sm font-medium">{{ loaningForm.item.name }}</p>
                         </div>
-                        
+
                         <div v-if="loaningForm.item.description">
                             <Label class="text-sm font-medium text-muted-foreground">Description</Label>
                             <p class="text-sm">{{ loaningForm.item.description }}</p>
                         </div>
-                        
+
                         <div>
                             <Label class="text-sm font-medium text-muted-foreground">Current Owner</Label>
                             <p class="text-sm">{{ loaningForm.item.owner.name }}</p>
                             <p class="text-xs text-muted-foreground">{{ loaningForm.item.owner.email }}</p>
                         </div>
-                        
+
                         <div>
                             <Label class="text-sm font-medium text-muted-foreground">Manager</Label>
                             <p class="text-sm">{{ loaningForm.item.manager.name }}</p>
@@ -182,7 +183,7 @@ const reject = () => {
                                 <Check class="mr-2 h-4 w-4" />
                                 Approve Request
                             </Button>
-                            
+
                             <Button @click="reject" variant="destructive" class="flex-1 max-w-xs">
                                 <X class="mr-2 h-4 w-4" />
                                 Reject Request
