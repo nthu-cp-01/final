@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Heading from '@/components/Heading.vue';
 import { type BreadcrumbItem } from '@/types';
-import { ArrowLeft, Check, X } from 'lucide-vue-next';
+import { ArrowLeft, Check, X, BadgeAlert, PackageCheck, BadgeMinus, Lock } from 'lucide-vue-next';
 import { formatDate } from '@/lib/utils';
 
 interface User {
@@ -50,6 +50,21 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: `/loaning-forms/${props.loaningForm.id}`,
     },
 ];
+
+const getItemStatusBadge = (status: string) => {
+    switch (status) {
+        case 'registered':
+            return { variant: 'secondary', icon: BadgeAlert };
+        case 'normal':
+            return { variant: 'success', icon: PackageCheck };
+        case 'gone':
+            return { variant: 'destructive', icon: BadgeMinus };
+        case 'reserved':
+            return { variant: 'default', icon: Lock };
+        default:
+            return { variant: 'outline', icon: null };
+    }
+};
 
 const getStatusBadge = (status: string) => {
     switch (status) {
@@ -116,23 +131,41 @@ const reject = () => {
                             </div>
                         </div>
 
-                        <div>
-                            <Label class="text-sm font-medium text-muted-foreground">Submitted By</Label>
-                            <p class="text-sm">{{ loaningForm.applicant.name }}</p>
-                            <p class="text-xs text-muted-foreground">{{ loaningForm.applicant.email }}</p>
-                        </div>
-
-                        <div>
-                            <Label class="text-sm font-medium text-muted-foreground">Submitted On</Label>
-                            <p class="text-sm">{{ formatDate(loaningForm.created_at) }}</p>
-                        </div>
-
-                        <div v-if="loaningForm.start_at && loaningForm.end_at" class="space-y-2">
+                        <div class="grid grid-cols-2 gaps-4">
                             <div>
+                                <Label class="text-sm font-medium text-muted-foreground">Submitted By</Label>
+                                <p class="text-sm">{{ loaningForm.applicant.name }}</p>
+                                <p class="text-xs text-muted-foreground">{{ loaningForm.applicant.email }}</p>
+                            </div>
+                            <div>
+                                <Label class="text-sm font-medium text-muted-foreground">Submitted On</Label>
+                                <p class="text-sm">{{ formatDate(loaningForm.created_at) }}</p>
+                            </div>
+                        </div>
+
+                        <div v-if="!(loaningForm.start_at && loaningForm.end_at)" class="grid grid-cols-2 gap-4">
+                            <div>
+                                <Label class="text-sm font-medium text-muted-foreground">Loan Status</Label>
+                                <p class="text-sm">Not Started</p>
+                            </div>
+                            <div>
+                                <Label class="text-sm font-medium text-muted-foreground">Target Item Status</Label>
+
+                                <Badge :variant="getItemStatusBadge(loaningForm.item.status).variant">
+                                    <component :is="getItemStatusBadge(loaningForm.item.status).icon"
+                                        class="mr-1 h-3 w-3" v-if="getItemStatusBadge(loaningForm.item.status).icon" />
+                                    {{ loaningForm.item.status.charAt(0).toUpperCase() +
+                                    loaningForm.item.status.slice(1) }}
+                                </Badge>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div v-if="loaningForm.start_at">
                                 <Label class="text-sm font-medium text-muted-foreground">Loan Start Date</Label>
                                 <p class="text-sm">{{ formatDate(loaningForm.start_at) }}</p>
                             </div>
-                            <div>
+                            <div v-if="loaningForm.end_at">
                                 <Label class="text-sm font-medium text-muted-foreground">Loan End Date</Label>
                                 <p class="text-sm">{{ formatDate(loaningForm.end_at) }}</p>
                             </div>
