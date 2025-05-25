@@ -2,6 +2,10 @@
 
 ## 0. 登入你要掃描的使用者身份，並去Settings->API Tokens去產生你驗證用的token
 - 如果要測試掃描流程，可以先用`bob@test.com`, `aoeuaoeu`這個帳號登入，然後產生API Token。
+![image](https://github.com/user-attachments/assets/1da25db9-eaac-4d4f-aefd-8929d70db910)
+![image](https://github.com/user-attachments/assets/149f779b-0b76-4ab8-8cd7-a2c822236883)
+![image](https://github.com/user-attachments/assets/591bf9ff-a0da-4cfc-aead-e5120e3ffcf4)
+
 
 ## 1. 驗證你拿到的token是否是正確的(掃使用者的QR Code)
 ```
