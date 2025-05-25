@@ -7,6 +7,7 @@ use App\Jobs\ProcessItemsImport;
 use App\Models\Item;
 use App\Models\Location;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -152,5 +153,68 @@ class ItemController extends Controller
         return redirect()
             ->route('items.index')
             ->with('success', 'CSV import has been queued for processing. Items will appear shortly.');
+    }
+
+    /**
+     * Handle IoT device scanning endpoint.
+     */
+    public function scan(Request $request): JsonResponse
+    {
+        // Validate the request payload
+        $validated = $request->validate([
+            'id' => 'required|integer|exists:items,id',
+        ]);
+
+        $itemId = $validated['id'];
+        $scanningUser = $request->user();
+
+        // Find the item with related models
+        $item = Item::with(['manager', 'owner', 'loaningForms' => function ($query) use ($scanningUser) {
+            $query->where('applicant_id', $scanningUser->id)
+                  ->where('status', 'approved')
+                  ->orderBy('created_at', 'desc');
+        }])->findOrFail($itemId);
+
+        // Handle different item statuses
+        switch ($item->status) {
+            case 'normal':
+                // If scanning user is manager, return 200
+                if ($scanningUser->id === $item->manager_id) {
+                    return response()->json(['message' => 'Scan successful'], 200);
+                }
+                break;
+
+            case 'registered':
+                // If scanning user is manager, set to 'normal'
+                if ($scanningUser->id === $item->manager_id) {
+                    $item->update(['status' => 'normal']);
+                    return response()->json(['message' => 'Item status updated to normal'], 200);
+                }
+                break;
+
+            case 'reserved':
+                // Look up related LoaningForm for scanning user
+                $loaningForm = $item->loaningForms->first();
+
+                if ($loaningForm) {
+                    // Check if we can fill start_at (loan action)
+                    if (is_null($loaningForm->start_at)) {
+                        $loaningForm->update(['start_at' => now()]);
+                        $item->update(['owner_id' => $scanningUser->id]);
+                        return response()->json(['message' => 'Item loaned successfully'], 200);
+                    }
+
+                    // Check if we can fill end_at (return action)
+                    if (is_null($loaningForm->end_at)) {
+                        $loaningForm->update(['end_at' => now()]);
+                        $item->update(['owner_id' => $item->manager_id]);
+                        return response()->json(['message' => 'Item returned successfully'], 200);
+                    }
+                }
+                break;
+        }
+
+        // Default case: unauthorized
+        return response()->json(['message' => 'Unauthorized scan'], 401);
     }
 }
