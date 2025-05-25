@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm, usePage } from '@inertiajs/vue3';
-import { ref, computed, onMounted, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import QRCodeStyling from 'qr-code-styling';
 
 import HeadingSmall from '@/components/HeadingSmall.vue';
@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import {
     Table,
@@ -19,21 +18,11 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import {
-    Dialog,
-    DialogClose,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { formatDate } from '@/lib/utils';
-import { Copy, Eye, EyeOff, Trash2, Plus, QrCode } from 'lucide-vue-next';
+import { Copy, Trash2, Plus, QrCode } from 'lucide-vue-next';
 import { toast } from 'vue-sonner';
 
 interface Token {
@@ -48,7 +37,10 @@ interface Props {
     tokens: Token[];
 }
 
+//eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<Props>();
+
+
 const page = usePage();
 
 const breadcrumbItems: BreadcrumbItem[] = [
@@ -67,12 +59,6 @@ const newToken = computed(() => {
 // Use a reactive ref instead of computed for the token value
 const tokenValue = ref('');
 
-// Also track the raw page props for debugging
-const debugPageProps = computed(() => {
-    console.log('Full page props:', page.props);
-    return page.props;
-});
-
 // Update token value when newToken changes
 watch(newToken, (token) => {
     if (token?.token) {
@@ -87,11 +73,6 @@ const form = useForm({
     name: '',
 });
 
-// Token visibility and QR code management
-const visibleTokens = ref<Set<number>>(new Set());
-const qrCodeElements = ref<Map<number, HTMLDivElement>>(new Map());
-const qrCodeInstances = ref<Map<number, QRCodeStyling>>(new Map());
-
 // New token handling
 const showNewToken = ref(false);
 const showNewTokenQR = ref(false);
@@ -101,7 +82,7 @@ const newTokenQRInstance = ref<QRCodeStyling | null>(null);
 const createToken = () => {
     form.post(route('api-tokens.store'), {
         preserveScroll: true,
-        onSuccess: (page) => {
+        onSuccess: () => {
             form.reset();
             showNewToken.value = true;
         },
@@ -122,78 +103,12 @@ const deleteToken = (tokenId: number) => {
     }
 };
 
-const toggleTokenVisibility = (tokenId: number) => {
-    if (visibleTokens.value.has(tokenId)) {
-        visibleTokens.value.delete(tokenId);
-        hideQRCode(tokenId);
-    } else {
-        visibleTokens.value.add(tokenId);
-    }
-};
-
-const toggleQRCode = (tokenId: number, token: string) => {
-    const existing = qrCodeInstances.value.get(tokenId);
-    if (existing) {
-        hideQRCode(tokenId);
-    } else {
-        showQRCode(tokenId, token);
-    }
-};
-
-const showQRCode = (tokenId: number, token: string) => {
-    const element = qrCodeElements.value.get(tokenId);
-    if (!element) return;
-
-    const qrCode = new QRCodeStyling({
-        width: 256,
-        height: 256,
-        type: 'svg',
-        data: token,
-        dotsOptions: {
-            color: '#000000',
-            type: 'rounded',
-        },
-        backgroundOptions: {
-            color: '#ffffff',
-        },
-        cornersSquareOptions: {
-            color: '#000000',
-            type: 'extra-rounded',
-        },
-        cornersDotOptions: {
-            color: '#000000',
-            type: 'dot',
-        },
-    });
-
-    qrCode.append(element);
-    qrCodeInstances.value.set(tokenId, qrCode);
-};
-
-const hideQRCode = (tokenId: number) => {
-    const element = qrCodeElements.value.get(tokenId);
-    const instance = qrCodeInstances.value.get(tokenId);
-
-    if (element) {
-        element.innerHTML = '';
-    }
-    if (instance) {
-        qrCodeInstances.value.delete(tokenId);
-    }
-};
-
 const copyToClipboard = async (text: string) => {
     try {
         await navigator.clipboard.writeText(text);
         toast.success('Token copied to clipboard');
     } catch (err) {
-        toast.error('Failed to copy token');
-    }
-};
-
-const setQRElement = (tokenId: number, element: HTMLDivElement | null) => {
-    if (element) {
-        qrCodeElements.value.set(tokenId, element);
+        toast.error('Failed to copy token', err);
     }
 };
 
