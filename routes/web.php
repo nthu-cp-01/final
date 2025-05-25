@@ -21,6 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('items', ItemController::class);
     Route::get('items-import', [ItemController::class, 'import'])->name('items.import');
     Route::post('items-import', [ItemController::class, 'processImport'])->name('items.import.process');
+    Route::post('items/qrcodes', [ItemController::class, 'qrCodes'])->name('items.qrcodes');
     
     Route::resource('loaning-forms', LoaningFormController::class);
     Route::post('loaning-forms/{loaningForm}/approve', [LoaningFormController::class, 'approve'])->name('loaning-forms.approve');

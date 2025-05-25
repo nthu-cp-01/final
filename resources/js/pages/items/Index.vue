@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Head, Link, usePage } from '@inertiajs/vue3';
-import { PlusCircle, Pencil, Trash2, PackageCheck, BadgeMinus, BadgeAlert, Lock, Upload } from 'lucide-vue-next';
+import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import { PlusCircle, Pencil, Trash2, PackageCheck, BadgeMinus, BadgeAlert, Lock, Upload, QrCode } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Heading from '@/components/Heading.vue';
 import { toast } from 'vue-sonner';
@@ -15,8 +15,9 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem } from '@/types';
-import { watch } from 'vue';
+import { watch, ref, computed, reactive } from 'vue';
 import { formatDate } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface User {
     id: number;
@@ -48,13 +49,71 @@ interface Props {
 const props = defineProps<Props>();
 const page = usePage();
 
+// Using reactive for selectedItems for better reactivity
+const state = reactive({
+    selectedItems: [] as number[],
+    selectedCount: 0
+});
+
+// Check if all items are selected
+const allSelected = computed(() => {
+    return state.selectedItems.length === props.items.length && props.items.length > 0;
+});
+
+// Check if any item is selected
+const anySelected = computed(() => {
+    return state.selectedItems.length > 0;
+});
+
+// Toggle all items selection
+const toggleAllSelection = () => {
+    if (allSelected.value) {
+        // Clear the array
+        state.selectedItems = [];
+    } else {
+        // Create a new array with all item IDs
+        state.selectedItems = [...props.items.map(item => item.id)];
+    }
+    state.selectedCount = state.selectedItems.length;
+};
+
+// Toggle an individual item selection
+const toggleItemSelection = (id: number) => {
+    const index = state.selectedItems.indexOf(id);
+    if (index === -1) {
+        // Add the item
+        state.selectedItems.push(id);
+    } else {
+        // Remove the item
+        state.selectedItems.splice(index, 1);
+    }
+    state.selectedCount = state.selectedItems.length;
+};
+
+// Handle QR code export
+const exportQrCodes = () => {
+    console.log('Export triggered, selected items:', state.selectedItems);
+    if (state.selectedItems.length > 0) {
+        toast.success(`Exporting ${state.selectedItems.length} QR code(s)`);
+        router.visit(route('items.qrcodes'), {
+            method: 'post',
+            data: {
+                items: state.selectedItems
+            },
+            preserveState: true
+        });
+    } else {
+        toast.error('Please select at least one item to export');
+    }
+};
+
 // Watch for flash messages from Inertia shared data
-watch(() => page.props.flash, (flash) => {
-    if (flash.success) {
+watch(() => page.props.flash, (flash: any) => {
+    if (flash?.success) {
         toast.success(flash.success);
     }
 
-    if (flash.error) {
+    if (flash?.error) {
         toast.error(flash.error);
     }
 }, { immediate: true });
@@ -66,19 +125,23 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+// Define the variants
+type BadgeVariant = 'default' | 'secondary' | 'destructive' | 'outline';
+
 // Function to get status badge variant
 const getStatusBadge = (status: string) => {
     switch (status) {
         case 'registered':
-            return { variant: 'secondary', icon: BadgeAlert };
+            return { variant: 'secondary' as BadgeVariant, icon: BadgeAlert };
         case 'normal':
-            return { variant: 'success', icon: PackageCheck };
+            // For compatibility with shadcn-vue badge component
+            return { variant: 'default' as BadgeVariant, icon: PackageCheck };
         case 'gone':
-            return { variant: 'destructive', icon: BadgeMinus };
+            return { variant: 'destructive' as BadgeVariant, icon: BadgeMinus };
         case 'reserved':
-            return { variant: 'default', icon: Lock };
+            return { variant: 'default' as BadgeVariant, icon: Lock };
         default:
-            return { variant: 'outline', icon: null };
+            return { variant: 'outline' as BadgeVariant, icon: null };
     }
 };
 </script>
@@ -98,6 +161,14 @@ const getStatusBadge = (status: string) => {
                             Import CSV
                         </Button>
                     </Link>
+                    <Button 
+                        variant="outline" 
+                        @click="exportQrCodes"
+                        :disabled="state.selectedCount === 0"
+                    >
+                        <QrCode class="mr-2 h-4 w-4" />
+                        Export QR Codes <span v-if="state.selectedCount > 0">({{ state.selectedCount }})</span>
+                    </Button>
                     <Link :href="route('items.create')" as="button">
                         <Button>
                             <PlusCircle class="mr-2 h-4 w-4" />
@@ -113,7 +184,16 @@ const getStatusBadge = (status: string) => {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead class="w-[20%]">Name</TableHead>
+                                <TableHead class="w-[5%]">
+                                    <div class="flex items-center">
+                                        <Checkbox 
+                                            :checked="allSelected" 
+                                            @click="toggleAllSelection"
+                                            :aria-label="allSelected ? 'Deselect all items' : 'Select all items'"
+                                        />
+                                    </div>
+                                </TableHead>
+                                <TableHead class="w-[15%]">Name</TableHead>
                                 <TableHead class="w-[15%]">Purchase Date</TableHead>
                                 <TableHead class="w-[15%]">Status</TableHead>
                                 <TableHead class="w-[15%]">Location</TableHead>
@@ -124,11 +204,20 @@ const getStatusBadge = (status: string) => {
                         </TableHeader>
                         <TableBody>
                             <TableRow v-if="items.length === 0">
-                                <TableCell colspan="7" class="text-center py-8">
+                                <TableCell colspan="8" class="text-center py-8">
                                     No items found. Click 'Add Item' to create one.
                                 </TableCell>
                             </TableRow>
                             <TableRow v-for="item in items" :key="item.id">
+                                <TableCell>
+                                    <div class="flex items-center">
+                                        <Checkbox 
+                                            :checked="state.selectedItems.includes(item.id)" 
+                                            @click="toggleItemSelection(item.id)"
+                                            :aria-label="`Select item ${item.name}`"
+                                        />
+                                    </div>
+                                </TableCell>
                                 <TableCell class="font-medium">
                                     <Link :href="route('items.show', item.id)" class="hover:underline">
                                     {{ item.name }}
