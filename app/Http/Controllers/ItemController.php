@@ -217,4 +217,27 @@ class ItemController extends Controller
         // Default case: unauthorized
         return response()->json(['message' => 'Unauthorized scan'], 401);
     }
+
+    /**
+     * Display the QR codes for the selected items.
+     */
+    public function qrCodes(Request $request)
+    {
+        $validated = $request->validate([
+            'items' => 'required|array',
+            'items.*' => 'exists:items,id',
+        ]);
+
+        $items = Item::with('location')->whereIn('id', $validated['items'])->get();
+
+        if ($items->isEmpty()) {
+            return redirect()
+                ->back()
+                ->with('error', 'No items selected for QR code generation.');
+        }
+
+        return Inertia::render('items/QrCodes', [
+            'items' => $items,
+        ]);
+    }
 }
