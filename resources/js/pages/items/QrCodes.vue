@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import QRCodeStyling from 'qr-code-styling';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { type BreadcrumbItem } from '@/types';
@@ -6,9 +7,6 @@ import { Button } from '@/components/ui/button';
 import { onMounted, ref } from 'vue';
 import { ArrowLeft, Printer, Download } from 'lucide-vue-next';
 import Heading from '@/components/Heading.vue';
-
-// Define the QRCodeStyling global from the library
-declare const QRCodeStyling: any;
 
 interface User {
     id: number;

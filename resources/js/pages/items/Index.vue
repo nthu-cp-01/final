@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { type BreadcrumbItem } from '@/types';
-import { watch, ref, computed, reactive } from 'vue';
+import { watch, computed, reactive } from 'vue';
 import { formatDate } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 
@@ -49,56 +49,61 @@ interface Props {
 const props = defineProps<Props>();
 const page = usePage();
 
-// Using reactive for selectedItems for better reactivity
+// Using reactive for selectedItems with v-model support
 const state = reactive({
-    selectedItems: [] as number[],
-    selectedCount: 0
+    selectedItems: {} as Record<number, boolean>,
 });
 
-// Check if all items are selected
-const allSelected = computed(() => {
-    return state.selectedItems.length === props.items.length && props.items.length > 0;
+// Computed property to get selected item IDs
+const selectedItemIds = computed(() => {
+    return Object.keys(state.selectedItems)
+        .filter(id => state.selectedItems[Number(id)])
+        .map(id => Number(id));
 });
 
-// Check if any item is selected
-const anySelected = computed(() => {
-    return state.selectedItems.length > 0;
+// Computed property to get selected count
+const selectedCount = computed(() => {
+    return selectedItemIds.value.length;
+});
+
+// Check if all items are selected, some are selected (indeterminate), or none are selected
+const allSelected = computed((): boolean | 'indeterminate' => {
+    const selectedCount = selectedItemIds.value.length;
+    const totalCount = props.items.length;
+    
+    if (selectedCount === 0) {
+        return false; // No items selected
+    } else if (selectedCount === totalCount && totalCount > 0) {
+        return true; // All items selected
+    } else {
+        return 'indeterminate'; // Some items selected
+    }
 });
 
 // Toggle all items selection
 const toggleAllSelection = () => {
-    if (allSelected.value) {
-        // Clear the array
-        state.selectedItems = [];
+    if (allSelected.value === true) {
+        // If all are selected, clear all selections
+        state.selectedItems = {};
     } else {
-        // Create a new array with all item IDs
-        state.selectedItems = [...props.items.map(item => item.id)];
+        // If none or some are selected, select all items
+        const newSelection: Record<number, boolean> = {};
+        props.items.forEach(item => {
+            newSelection[item.id] = true;
+        });
+        state.selectedItems = newSelection;
     }
-    state.selectedCount = state.selectedItems.length;
-};
-
-// Toggle an individual item selection
-const toggleItemSelection = (id: number) => {
-    const index = state.selectedItems.indexOf(id);
-    if (index === -1) {
-        // Add the item
-        state.selectedItems.push(id);
-    } else {
-        // Remove the item
-        state.selectedItems.splice(index, 1);
-    }
-    state.selectedCount = state.selectedItems.length;
 };
 
 // Handle QR code export
 const exportQrCodes = () => {
-    console.log('Export triggered, selected items:', state.selectedItems);
-    if (state.selectedItems.length > 0) {
-        toast.success(`Exporting ${state.selectedItems.length} QR code(s)`);
+    console.log('Export triggered, selected items:', selectedItemIds.value);
+    if (selectedItemIds.value.length > 0) {
+        toast.success(`Exporting ${selectedItemIds.value.length} QR code(s)`);
         router.visit(route('items.qrcodes'), {
             method: 'post',
             data: {
-                items: state.selectedItems
+                items: selectedItemIds.value
             },
             preserveState: true
         });
@@ -155,9 +160,9 @@ const getStatusBadge = (status: string) => {
             <div class="flex items-center justify-between">
                 <Heading title="Items" description="Manage inventory items" />
                 <div class="flex gap-2">
-                    <Button variant="outline" @click="exportQrCodes" v-show="state.selectedCount !== 0">
+                    <Button variant="outline" @click="exportQrCodes" v-show="selectedCount !== 0">
                         <QrCode class="mr-2 h-4 w-4" />
-                        Export QR Codes <span v-if="state.selectedCount > 0">({{ state.selectedCount }})</span>
+                        Export QR Codes <span v-if="selectedCount > 0">({{ selectedCount }})</span>
                     </Button>
                     <Link :href="route('items.import')" as="button">
                     <Button variant="outline">
@@ -182,8 +187,8 @@ const getStatusBadge = (status: string) => {
                             <TableRow>
                                 <TableHead class="w-[5%]">
                                     <div class="flex items-center">
-                                        <Checkbox :checked="allSelected" @click="toggleAllSelection"
-                                            :aria-label="allSelected ? 'Deselect all items' : 'Select all items'" />
+                                        <Checkbox :modelValue="allSelected" @update:modelValue="toggleAllSelection"
+                                            :aria-label="allSelected === true ? 'Deselect all items' : 'Select all items'" />
                                     </div>
                                 </TableHead>
                                 <TableHead class="w-[15%]">Name</TableHead>
@@ -204,8 +209,7 @@ const getStatusBadge = (status: string) => {
                             <TableRow v-for="item in items" :key="item.id">
                                 <TableCell>
                                     <div class="flex items-center">
-                                        <Checkbox :checked="state.selectedItems.includes(item.id)"
-                                            @click="toggleItemSelection(item.id)"
+                                        <Checkbox v-model="state.selectedItems[item.id]"
                                             :aria-label="`Select item ${item.name}`" />
                                     </div>
                                 </TableCell>
