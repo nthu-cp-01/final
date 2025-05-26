@@ -45,7 +45,7 @@ interface Props {
     items: Item[];
 }
 
-//eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const props = defineProps<Props>();
 const page = usePage();
 
@@ -155,25 +155,21 @@ const getStatusBadge = (status: string) => {
             <div class="flex items-center justify-between">
                 <Heading title="Items" description="Manage inventory items" />
                 <div class="flex gap-2">
-                    <Link :href="route('items.import')" as="button">
-                        <Button variant="outline">
-                            <Upload class="mr-2 h-4 w-4" />
-                            Import CSV
-                        </Button>
-                    </Link>
-                    <Button 
-                        variant="outline" 
-                        @click="exportQrCodes"
-                        :disabled="state.selectedCount === 0"
-                    >
+                    <Button variant="outline" @click="exportQrCodes" v-show="state.selectedCount !== 0">
                         <QrCode class="mr-2 h-4 w-4" />
                         Export QR Codes <span v-if="state.selectedCount > 0">({{ state.selectedCount }})</span>
                     </Button>
+                    <Link :href="route('items.import')" as="button">
+                    <Button variant="outline">
+                        <Upload class="mr-2 h-4 w-4" />
+                        Import CSV
+                    </Button>
+                    </Link>
                     <Link :href="route('items.create')" as="button">
-                        <Button>
-                            <PlusCircle class="mr-2 h-4 w-4" />
-                            Add Item
-                        </Button>
+                    <Button>
+                        <PlusCircle class="mr-2 h-4 w-4" />
+                        Add Item
+                    </Button>
                     </Link>
                 </div>
             </div>
@@ -186,11 +182,8 @@ const getStatusBadge = (status: string) => {
                             <TableRow>
                                 <TableHead class="w-[5%]">
                                     <div class="flex items-center">
-                                        <Checkbox 
-                                            :checked="allSelected" 
-                                            @click="toggleAllSelection"
-                                            :aria-label="allSelected ? 'Deselect all items' : 'Select all items'"
-                                        />
+                                        <Checkbox :checked="allSelected" @click="toggleAllSelection"
+                                            :aria-label="allSelected ? 'Deselect all items' : 'Select all items'" />
                                     </div>
                                 </TableHead>
                                 <TableHead class="w-[15%]">Name</TableHead>
@@ -211,11 +204,9 @@ const getStatusBadge = (status: string) => {
                             <TableRow v-for="item in items" :key="item.id">
                                 <TableCell>
                                     <div class="flex items-center">
-                                        <Checkbox 
-                                            :checked="state.selectedItems.includes(item.id)" 
+                                        <Checkbox :checked="state.selectedItems.includes(item.id)"
                                             @click="toggleItemSelection(item.id)"
-                                            :aria-label="`Select item ${item.name}`"
-                                        />
+                                            :aria-label="`Select item ${item.name}`" />
                                     </div>
                                 </TableCell>
                                 <TableCell class="font-medium">

@@ -72,18 +72,18 @@ const downloadAll = async () => {
 const generateQRCode = (item: Item, containerElement: HTMLElement) => {
     // Clear any existing content
     containerElement.innerHTML = '';
-    
+
     // Create a unique container for this QR code
     const qrContainer = document.createElement('div');
     qrContainer.id = `qr-container-${item.id}`;
     containerElement.appendChild(qrContainer);
-    
+
     // Create a new QR code instance with the item's ID
     try {
         const qrCode = new QRCodeStyling({
             width: 200,
             height: 200,
-            type: "svg",
+            type: "canvas",
             data: JSON.stringify({ id: item.id }),
             dotsOptions: {
                 color: "#000000",
@@ -95,15 +95,18 @@ const generateQRCode = (item: Item, containerElement: HTMLElement) => {
             backgroundOptions: {
                 color: "#ffffff",
             },
+            cornersDotOptions: {
+                color: '#000000',
+                type: 'dot',
+            },
         });
-        
+
         // Append the QR code to the container
         qrCode.append(qrContainer);
-        
+
         // Store the reference for later use
         qrCodeRefs.value[item.id] = qrCode;
-        
-        console.log(`QR code generated successfully for item ${item.id}`);
+
     } catch (error) {
         console.error(`Error generating QR code for item ${item.id}:`, error);
     }
@@ -111,9 +114,9 @@ const generateQRCode = (item: Item, containerElement: HTMLElement) => {
 
 onMounted(() => {
     // Log the items we're processing
-    console.log(`QR Codes component mounted. Generating QR codes for ${props.items.length} items:`, 
+    console.log(`QR Codes component mounted. Generating QR codes for ${props.items.length} items:`,
         props.items.map(item => item.id));
-    
+
     // Use nextTick to ensure DOM is ready
     setTimeout(() => {
         // Process each item one by one
@@ -122,9 +125,10 @@ onMounted(() => {
             setTimeout(() => {
                 const qrCodeElement = document.getElementById(`qr-code-${item.id}`);
                 console.log(`Processing item ${item.id}, found element:`, !!qrCodeElement);
-                
+
                 if (qrCodeElement) {
                     generateQRCode(item, qrCodeElement);
+                    console.log(`QR code generated successfully for item ${item.id}`);
                 } else {
                     console.error(`Element not found for item ${item.id}`);
                 }
@@ -135,6 +139,7 @@ onMounted(() => {
 </script>
 
 <template>
+
     <Head title="Item QR Codes" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
@@ -151,10 +156,10 @@ onMounted(() => {
                         Download All
                     </Button>
                     <Link :href="route('items.index')" as="button">
-                        <Button>
-                            <ArrowLeft class="mr-2 h-4 w-4" />
-                            Back to Items
-                        </Button>
+                    <Button>
+                        <ArrowLeft class="mr-2 h-4 w-4" />
+                        Back to Items
+                    </Button>
                     </Link>
                 </div>
             </div>
@@ -162,16 +167,14 @@ onMounted(() => {
             <div class="border border-sidebar-border/70 bg-white dark:border-sidebar-border dark:bg-black rounded-xl">
                 <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 print:grid-cols-3">
-                        <div 
-                            v-for="item in items" 
-                            :key="item.id" 
-                            class="flex flex-col items-center border border-gray-200 dark:border-gray-800 rounded-lg p-4 print:break-inside-avoid"
-                        >
+                        <div v-for="item in items" :key="item.id"
+                            class="flex flex-col items-center border border-gray-200 dark:border-gray-800 rounded-lg p-4 print:break-inside-avoid">
                             <div :id="`qr-code-${item.id}`" class="mb-4 w-[200px] h-[200px]"></div>
                             <div class="text-center">
                                 <p class="font-semibold">{{ item.name }}</p>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">ID: {{ item.id }}</p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400">Location: {{ item.location.name }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Location: {{ item.location.name }}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -183,7 +186,9 @@ onMounted(() => {
 
 <style scoped>
 @media print {
-    button, a {
+
+    button,
+    a {
         display: none !important;
     }
 }
