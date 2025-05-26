@@ -1,0 +1,95 @@
+services:
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:    laravel
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB:      laravel
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    volumes:
+      - redis-data:/data
+
+  migrator:
+    image: ghcr.io/nthu-cp-01/final-migration:main
+    restart: "no"
+    depends_on:
+      - db
+      - redis
+    environment:
+      APP_ENV:            production
+      APP_KEY:            base64:3vVjC2JIukr6/8WQrd3cxYsdn4DKNn35h3/t/uIaG5M=
+      APP_URL:            http://localhost
+      APP_DEBUG:          "false"
+
+      DB_CONNECTION:      pgsql
+      DB_HOST:            db
+      DB_PORT:            "5432"
+      DB_DATABASE:        laravel
+      DB_USERNAME:        laravel
+      DB_PASSWORD:        secret
+
+      REDIS_CLIENT:       predis
+      REDIS_HOST:         redis
+      REDIS_PORT:         "6379"
+      REDIS_PASSWORD:     ""
+
+      CACHE_DRIVER:       redis
+      QUEUE_CONNECTION:   redis
+
+      SESSION_DRIVER:     redis
+      SESSION_CONNECTION: default
+      SESSION_LIFETIME:   "120"
+
+      FILESYSTEM_DISK:    local
+
+  app:
+    image: ghcr.io/nthu-cp-01/final:main
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    environment:
+      APP_ENV:            production
+      APP_KEY:            base64:3vVjC2JIukr6/8WQrd3cxYsdn4DKNn35h3/t/uIaG5M=
+      APP_URL:            http://localhost
+      APP_DEBUG:          "true"
+
+      DB_CONNECTION:      pgsql
+      DB_HOST:            db
+      DB_PORT:            "5432"
+      DB_DATABASE:        laravel
+      DB_USERNAME:        laravel
+      DB_PASSWORD:        secret
+
+      REDIS_CLIENT:       predis
+      REDIS_HOST:         redis
+      REDIS_PORT:         "6379"
+      REDIS_PASSWORD:     ""
+
+      CACHE_DRIVER:       redis
+      QUEUE_CONNECTION:   redis
+
+      SESSION_DRIVER:     redis
+      SESSION_CONNECTION: default
+      SESSION_LIFETIME:   "120"
+
+      FILESYSTEM_DISK:    local
+
+      COGNITO_HOST:            https://YOUR_DOMAIN.auth.YOUR_REGION.amazoncognito.com
+      COGNITO_CLIENT_ID:       your-client-id
+      COGNITO_CLIENT_SECRET:   your-client-secret
+      COGNITO_LOGIN_SCOPE:     "openid,profile,email"
+      COGNITO_CALLBACK_URL:    https://your-lb-dns/login/cognito/callback
+      COGNITO_SIGN_OUT_URL:    https://your-lb-dns/login
+    ports:
+      - "80:80"
+
+volumes:
+  db-data:
+  redis-data:
