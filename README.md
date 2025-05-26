@@ -1,23 +1,29 @@
-# API使用指南
+# 財產管理系統使用指南
+## A. 物件的QR Code產生/列印
+![image](https://github.com/user-attachments/assets/ac99d8ff-c4fa-4915-a413-6e6b70cb3d24)
+![image](https://github.com/user-attachments/assets/2097418c-72f3-4d8d-9356-ea2bd6c2fe95)
+
+
+## B. API的呼叫
 - 目前規劃的出借流程如[圖](https://excalidraw.com/#json=RBsH2rmJFH9zmCvb0ZRzR,y-RMQDe5B3bHHGnrqVIAFw):
 ![image](https://github.com/user-attachments/assets/3c25a926-a99d-478f-b8f3-d665f5b90b02)
 
 
-## 0. 登入你要掃描的使用者身份，並去Settings->API Tokens去產生你驗證用的token
+### 0. 登入你要掃描的使用者身份，並去Settings->API Tokens去產生你驗證用的token
 - 如果要測試掃描流程，可以先用`bob@test.com`, `aoeuaoeu`這個帳號登入，然後產生API Token。
 ![image](https://github.com/user-attachments/assets/1da25db9-eaac-4d4f-aefd-8929d70db910)
 ![image](https://github.com/user-attachments/assets/149f779b-0b76-4ab8-8cd7-a2c822236883)
 ![image](https://github.com/user-attachments/assets/591bf9ff-a0da-4cfc-aead-e5120e3ffcf4)
 
 
-## 1. 驗證你拿到的token是否是正確的(掃使用者的QR Code)
+### 1. 驗證你拿到的token是否是正確的(掃使用者的QR Code)
 ```
 curl -k -X GET -H "Authorization: Bearer <使用者token>" https://<你的load-balancer dns位置>/api/user
 ```
 - 正確的話會得到200
 - 錯誤的話會得到302
 
-## 2. 發送掃描的資料到後端Server
+### 2. 發送掃描的資料到後端Server
 - 實際操作時`{"id":"<item 的 id>"}`的部分會包在QR Code中。(預計)
 - 正確的回應都會是200，json裡會有回應正確的原因。
 - 如果錯誤，除了json格式錯誤、item id(都會回422)不存在之外，應該都會回401。
