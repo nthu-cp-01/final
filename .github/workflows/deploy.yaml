@@ -1,0 +1,31 @@
+name: Deploy to lab testing machine
+
+on:
+  push:
+    branches:
+      - main  # Adjust the branch as needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Tailscale
+      uses: tailscale/github-action@v3
+      with:
+        oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+        oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+        tags: tag:ci
+
+    - name: Docker Stack Deploy
+      uses: cssnr/stack-deploy-action@v1
+      with:
+        name: nthu-cp-01-staging
+        file: compose.yaml
+        host: 100.85.222.36
+        user: jsl
+        ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
