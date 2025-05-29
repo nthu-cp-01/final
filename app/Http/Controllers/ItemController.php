@@ -199,7 +199,7 @@ class ItemController extends Controller
                 // Look up related LoaningForm for scanning user
                 $loaningForm = LoaningForm::where('item_id', $itemId)
                     ->where('applicant_id', $scanningUser->id)
-                    ->where('status', 'approved')
+                    ->where('in_progress', true)
                     ->orderBy('created_at', 'desc')
                     ->first();
 

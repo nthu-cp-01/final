@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('applicant_id')->constrained('users')->onDelete('cascade');
             $table->timestamp('start_at')->nullable();
             $table->timestamp('end_at')->nullable();
+            $table->boolean('in_progress')
+                ->storedAs("(status = 'approved' AND (start_at IS NULL OR end_at IS NULL))");
             $table->enum('status', ['requested', 'approved', 'rejected'])->default('requested');
             $table->timestamps();
         });
