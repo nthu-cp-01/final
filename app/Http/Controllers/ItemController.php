@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ImportItemsRequest;
 use App\Jobs\ProcessItemsImport;
 use App\Models\Item;
+use App\Models\LoaningForm;
 use App\Models\Location;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -169,18 +170,20 @@ class ItemController extends Controller
         $scanningUser = $request->user();
 
         // Find the item with related models
-        $item = Item::with(['manager', 'owner', 'loaningForms' => function ($query) use ($scanningUser) {
-            $query->where('applicant_id', $scanningUser->id)
-                  ->where('status', 'approved')
-                  ->orderBy('created_at', 'desc');
-        }])->findOrFail($itemId);
+        $item = Item::findOrFail($itemId);
 
         // Handle different item statuses
         switch ($item->status) {
+            case 'gone':
+                // If scanning user is manager, set to normal
+                if ($scanningUser->id === $item->manager_id) {
+                    $item->update(['status' => 'normal']);
+                    return response()->json(['message' => 'Finally found ya boi!'], 200);
+                }
             case 'normal':
                 // If scanning user is manager, return 200
                 if ($scanningUser->id === $item->manager_id) {
-                    return response()->json(['message' => 'Scan successful'], 200);
+                    return response()->json(['message' => "I mean, it's already there, but okay..."], 200);
                 }
                 break;
 
@@ -188,13 +191,17 @@ class ItemController extends Controller
                 // If scanning user is manager, set to 'normal'
                 if ($scanningUser->id === $item->manager_id) {
                     $item->update(['status' => 'normal']);
-                    return response()->json(['message' => 'Item status updated to normal'], 200);
+                    return response()->json(['message' => "You're mine!"], 200);
                 }
                 break;
 
             case 'reserved':
                 // Look up related LoaningForm for scanning user
-                $loaningForm = $item->loaningForms->first();
+                $loaningForm = LoaningForm::where('item_id', $itemId)
+                    ->where('applicant_id', $scanningUser->id)
+                    ->where('in_progress', true)
+                    ->orderBy('created_at', 'desc')
+                    ->first();
 
                 if ($loaningForm) {
                     // Check if we can fill start_at (loan action)
@@ -212,6 +219,11 @@ class ItemController extends Controller
                     }
                 }
                 break;
+        }
+
+        // Debug
+        if ($scanningUser->id === $item->manager_id) {
+            return response()->json(['message' => 'I know you are manager of the item, but what are you doing here?'], 401);
         }
 
         // Default case: unauthorized
