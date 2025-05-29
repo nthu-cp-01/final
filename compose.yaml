@@ -1,7 +1,9 @@
 services:
   db:
     image: postgres:15
-    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: on-failure
     environment:
       POSTGRES_USER:    laravel
       POSTGRES_PASSWORD: secret
@@ -11,13 +13,17 @@ services:
 
   redis:
     image: redis:7
-    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: on-failure
     volumes:
       - redis-data:/data
 
   migrator:
     image: ghcr.io/nthu-cp-01/final-migration:main
-    restart: "no"
+    deploy:
+      restart_policy:
+        condition: none
     depends_on:
       - db
       - redis
@@ -50,7 +56,9 @@ services:
 
   app:
     image: ghcr.io/nthu-cp-01/final:main
-    restart: unless-stopped
+    deploy:
+      restart_policy:
+        condition: on-failure
     depends_on:
       - db
       - redis
