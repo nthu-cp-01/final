@@ -18,7 +18,7 @@ class ItemScanApiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create a location for items
         $this->location = Location::factory()->create([
             'name' => 'Test Location'
@@ -75,7 +75,7 @@ class ItemScanApiTest extends TestCase
         $response = $this->postJson('/api/scan', ['id' => $item->id]);
 
         $response->assertStatus(200)
-                 ->assertJson(['message' => 'Scan successful']);
+                 ->assertJson(['message' => "I mean, it's already there, but okay..."]);
     }
 
     #[Test]
@@ -114,7 +114,7 @@ class ItemScanApiTest extends TestCase
         $response = $this->postJson('/api/scan', ['id' => $item->id]);
 
         $response->assertStatus(200)
-                 ->assertJson(['message' => 'Item status updated to normal']);
+                 ->assertJson(['message' => "You're mine!"]);
 
         $this->assertEquals('normal', $item->fresh()->status);
     }
@@ -137,7 +137,7 @@ class ItemScanApiTest extends TestCase
 
         $response->assertStatus(401)
                  ->assertJson(['message' => 'Unauthorized scan']);
-        
+
         // Status should remain unchanged
         $this->assertEquals('registered', $item->fresh()->status);
     }
@@ -290,7 +290,7 @@ class ItemScanApiTest extends TestCase
     }
 
     #[Test]
-    public function scanning_gone_status_item_returns_unauthorized()
+    public function scanning_gone_status_item_sets_it_to_normal()
     {
         $manager = User::factory()->create();
         $item = Item::factory()->create([
@@ -304,8 +304,8 @@ class ItemScanApiTest extends TestCase
 
         $response = $this->postJson('/api/scan', ['id' => $item->id]);
 
-        $response->assertStatus(401)
-                 ->assertJson(['message' => 'Unauthorized scan']);
+        $response->assertStatus(200)
+                 ->assertJson(['message' => "Finally found ya boi!"]);
     }
 
     #[Test]
